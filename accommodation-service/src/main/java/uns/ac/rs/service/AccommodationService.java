@@ -2,6 +2,7 @@ package uns.ac.rs.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.repository.AccommodationRepository;
 
@@ -22,10 +23,12 @@ public class AccommodationService {
         return accommodationRepository.findByIdOptional(id);
     }
 
+    @Transactional
     public void addAccommodation(Accommodation accommodation) {
         accommodationRepository.persist(accommodation);
     }
 
+    @Transactional
     public void updateAccommodation(Long id, Accommodation updatedAccommodation) {
         accommodationRepository.findByIdOptional(id).ifPresent(existingAccommodation -> {
             existingAccommodation.setName(updatedAccommodation.getName());
@@ -40,6 +43,7 @@ public class AccommodationService {
         });
     }
 
+    @Transactional
     public void deleteAccommodation(Long id) {
         accommodationRepository.findByIdOptional(id).ifPresent(accommodationRepository::delete);
     }
