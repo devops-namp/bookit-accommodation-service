@@ -2,13 +2,20 @@ package uns.ac.rs.controlller;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.service.AccommodationService;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.Optional;
+import jakarta.ws.rs.core.MediaType;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+
+
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import io.vertx.core.json.JsonObject;
 
 @Path("/accommodation")
 @Produces(MediaType.APPLICATION_JSON)
@@ -18,16 +25,27 @@ public class AccommodationController {
     @Inject
     AccommodationService accommodationService;
 
-    @GET
-    @Path("/plain")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String get() {
-        return "accommodation";
-    }
+    @Inject
+    @Channel("filter-request-queue")
+    Emitter<String> stringEmitter;
 
+
+//    @Incoming("test-queue")
+//    public void consume(JsonObject json) {
+//        Book book = json.mapTo(Book.class);
+//        System.out.println("Received book: " + book.title + " by " + book.author);
+//    }
     @GET
     public List<Accommodation> getAll() {
+        System.out.println("Dobavi mi sve korisnike");
+        stringEmitter.send("dobavi");
         return accommodationService.getAll();
+    }
+
+    @Incoming("filter-response-queue")
+    public void consume(JsonObject json) {
+        Book book = json.mapTo(Book.class);
+        System.out.println("Primljena knjiga " + book.title + " by " + book.author);
     }
 
     @GET
@@ -57,4 +75,6 @@ public class AccommodationController {
         accommodationService.deleteAccommodation(id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
+
+    
 }
