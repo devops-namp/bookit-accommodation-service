@@ -30,11 +30,6 @@ public class AccommodationController {
     Emitter<String> stringEmitter;
 
 
-//    @Incoming("test-queue")
-//    public void consume(JsonObject json) {
-//        Book book = json.mapTo(Book.class);
-//        System.out.println("Received book: " + book.title + " by " + book.author);
-//    }
     @GET
     public List<Accommodation> getAll() {
         System.out.println("Dobavi mi sve korisnike");
