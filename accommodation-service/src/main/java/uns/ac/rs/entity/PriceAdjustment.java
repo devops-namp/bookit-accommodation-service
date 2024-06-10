@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,15 +17,15 @@ import java.time.LocalDate;
 public class PriceAdjustment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-
-    private LocalDate fromDate;
-    private LocalDate toDate;
-    private double price;
 
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "price_adjustment_date_id", referencedColumnName = "id")
+    private PriceAdjustmentDate priceAdjustmentDate;
 }

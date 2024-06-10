@@ -1,4 +1,4 @@
-INSERT INTO bookit_accommodations (name, location, filters, minguests, maxguests, pricetype)
+INSERT INTO bookit-accommodation (name, location, filters, minguests, maxguests, pricetype)
 VALUES ('Ocean View Apartment', 'Miami Beach, FL', 'wifi,free parking,kitchen', 1, 4, 'price per unit');
 
 INSERT INTO priceadjustment (fromdate, todate, price, accommodation_id)

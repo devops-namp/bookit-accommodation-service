@@ -4,16 +4,26 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import uns.ac.rs.entity.Accommodation;
+import uns.ac.rs.entity.PriceAdjustment;
+import uns.ac.rs.entity.PriceAdjustmentDate;
 import uns.ac.rs.repository.AccommodationRepository;
+import uns.ac.rs.repository.PriceAdjustmentDateRepository;
+import uns.ac.rs.repository.PriceAdjustmentRepository;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 @ApplicationScoped
 public class AccommodationService {
 
     @Inject
     AccommodationRepository accommodationRepository;
+
+    @Inject
+    PriceAdjustmentRepository priceAdjustmentRepository;
+
+    @Inject
+    PriceAdjustmentDateRepository priceAdjustmentDateRepository;
 
     public List<Accommodation> getAll() {
         return accommodationRepository.listAll();
@@ -46,5 +56,38 @@ public class AccommodationService {
     @Transactional
     public void deleteAccommodation(Long id) {
         accommodationRepository.findByIdOptional(id).ifPresent(accommodationRepository::delete);
+    }
+
+    @Transactional
+    public void adjustPrices(Long id, Map<LocalDate, Double> newPrices) {
+        var accommodationOptional = accommodationRepository.findByIdOptional(id);
+        if (accommodationOptional.isEmpty()) {
+            return;
+        }
+        var accommodation = accommodationOptional.get();
+
+        for (var priceAdjustment : accommodation.getPriceAdjustments()) {
+            priceAdjustmentRepository.delete(priceAdjustment);
+        }
+        accommodation.getPriceAdjustments().clear();
+
+        List<PriceAdjustment> priceAdjustments = new ArrayList<>();
+
+        newPrices.forEach((date, price) -> {
+            var priceAdjustment = new PriceAdjustment();
+            priceAdjustment.setAccommodation(accommodation);
+            priceAdjustmentRepository.persist(priceAdjustment);
+
+            var priceAdjustmentDate = new PriceAdjustmentDate(date, price);
+            priceAdjustmentDate.setPriceAdjustment(priceAdjustment);
+            priceAdjustmentDateRepository.persist(priceAdjustmentDate);
+
+            priceAdjustment.setPriceAdjustmentDate(priceAdjustmentDate);
+            priceAdjustmentRepository.persist(priceAdjustment);
+            priceAdjustments.add(priceAdjustment);
+        });
+
+        accommodation.setPriceAdjustments(priceAdjustments);
+        accommodationRepository.persist(accommodation);
     }
 }
