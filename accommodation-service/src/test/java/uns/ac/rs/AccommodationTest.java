@@ -156,4 +156,22 @@ class AccommodationTest {
         price = response.jsonPath().getDouble("priceAdjustments[" + index + "].priceAdjustmentDate.price");
         assertThat(price, is(100.0));
     }
+
+    @Test
+    void testSearch() {
+        given()
+                .queryParam("name", "Ocean View")
+                .queryParam("location", "Miami Beach, FL")
+                .queryParam("filters", "wifi,free parking,kitchen")
+                .queryParam("minGuests", 1)
+                .queryParam("maxGuests", 4)
+                .queryParam("fromDate", "2024-06-01")
+                .queryParam("toDate", "2024-06-30")
+                .queryParam("price", 150.00)
+                .queryParam("priceType", "price per unit")
+                .when().get("/accommodation/search")
+                .then()
+                .statusCode(200)
+                .body("$.size()", is(greaterThanOrEqualTo(0)));
+    }
 }
