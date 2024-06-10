@@ -103,4 +103,21 @@ public class AccommodationController {
         }
         return Response.ok(new AccommodationDto(accommodation)).build();
     }
+    @GET
+    @Path("/search")
+    @PermitAll
+    public List<Accommodation> searchAccommodations(@QueryParam("name") String name,
+                                                    @QueryParam("location") String location,
+                                                    @QueryParam("filters") List<String> filters,
+                                                    @QueryParam("minGuests") Integer minGuests,
+                                                    @QueryParam("maxGuests") Integer maxGuests,
+                                                    @QueryParam("fromDate") String fromDateStr,
+                                                    @QueryParam("toDate") String toDateStr,
+                                                    @QueryParam("price") Double price,
+                                                    @QueryParam("priceType") String priceType) {
+        LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
+        LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
+
+        return accommodationService.searchAccommodations(name, location, filters, minGuests, maxGuests, fromDate, toDate, price, priceType);
+    }
 }
