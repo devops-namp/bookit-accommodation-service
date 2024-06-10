@@ -30,6 +30,7 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
         }
         if (fromDate != null) {
             query.append(" AND pa.fromDate >= :fromDate");
+            query.append(" AND pa.toDate >= :fromDate");
         }
         if (toDate != null) {
             query.append(" AND pa.toDate <= :toDate");
