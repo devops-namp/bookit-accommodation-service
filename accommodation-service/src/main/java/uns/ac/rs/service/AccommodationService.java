@@ -93,4 +93,10 @@ public class AccommodationService {
         accommodationRepository.persist(accommodation);
         return accommodation;
     }
+
+    public List<Accommodation> searchAccommodations(String name, String location, List<String> filters, Integer minGuests,
+                                                    Integer maxGuests, LocalDate fromDate, LocalDate toDate, Double price,
+                                                    String priceType) {
+        return accommodationRepository.search(name, location, filters, minGuests, maxGuests, fromDate, toDate, price, priceType);
+    }
 }
