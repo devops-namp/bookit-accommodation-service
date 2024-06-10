@@ -170,4 +170,16 @@ class AccommodationServiceTest {
         verify(priceAdjustmentDateRepository, times(1)).persist(any(PriceAdjustmentDate.class));
         verify(accommodationRepository, times(1)).persist(accommodation);
     }
+
+    @Test
+    void testSearch() {
+        Accommodation accommodation = new Accommodation();
+        List<Accommodation> accommodations = List.of(accommodation);
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyString()))
+                .thenReturn(accommodations);
+
+        List<Accommodation> result = accommodationService.searchAccommodations("Ocean View", "Miami Beach, FL", List.of("wifi", "free parking", "kitchen"), 1, 4, LocalDate.of(2024, 6, 1), LocalDate.of(2024, 6, 30), 150.00, "price per unit");
+        assertEquals(1, result.size());
+        verify(accommodationRepository, times(1)).search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyString());
+    }
 }
