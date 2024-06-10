@@ -87,6 +87,8 @@ public class AccommodationService {
             priceAdjustments.add(priceAdjustment);
         });
 
+        priceAdjustments.sort(Comparator.comparing(obj -> obj.getPriceAdjustmentDate().getDate()));
+
         accommodation.setPriceAdjustments(priceAdjustments);
         accommodationRepository.persist(accommodation);
         return accommodation;
