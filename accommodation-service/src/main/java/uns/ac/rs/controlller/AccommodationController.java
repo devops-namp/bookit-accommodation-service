@@ -5,11 +5,15 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import uns.ac.rs.entity.Accommodation;
+import uns.ac.rs.entity.PriceAdjustment;
+import uns.ac.rs.entity.PriceAdjustmentDate;
+import uns.ac.rs.request.AdjustPriceRequest;
 import uns.ac.rs.service.AccommodationService;
 import jakarta.ws.rs.core.Response;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
+
 import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
@@ -78,5 +82,23 @@ public class AccommodationController {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    
+    @PUT
+    @Path("/price/{id}")
+    @PermitAll
+    public Response adjustPrices(@PathParam("id") Long id, AdjustPriceRequest request) {
+        Map<LocalDate, Double> newPricesMap = new HashMap<>();
+
+        request.getPricesPerInterval().forEach(intervalPrice -> {
+            var startDate = intervalPrice.getStartDate();
+            var endDate = intervalPrice.getEndDate();
+            var price = intervalPrice.getPrice();
+
+            startDate.datesUntil(endDate.plusDays(1)).forEach(date ->
+                newPricesMap.put(date, price)
+            );
+        });
+
+        accommodationService.adjustPrices(id, newPricesMap);
+        return Response.status(Response.Status.OK).build();
+    }
 }

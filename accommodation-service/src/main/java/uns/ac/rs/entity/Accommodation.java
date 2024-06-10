@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "bookit-accommodations")
+@Table(name = "bookit-accommodation")
 public class Accommodation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Accommodation {
     private int maxGuests;
     private String priceType;
 
-    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL)
     private List<PriceAdjustment> priceAdjustments;
 
     @ElementCollection
