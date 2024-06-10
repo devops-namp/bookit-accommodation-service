@@ -62,7 +62,7 @@ public class AccommodationController {
     @RolesAllowed({"HOST" })
     public Response addAccommodation(Accommodation accommodation) {
         accommodationService.addAccommodation(accommodation);
-        return Response.status(Response.Status.CREATED).entity(accommodation).build();
+        return Response.status(Response.Status.CREATED).entity(new AccommodationDto(accommodation)).build();
     }
 
     @PUT
@@ -70,7 +70,7 @@ public class AccommodationController {
     @RolesAllowed({ "HOST" })
     public Response updateAccommodation(@PathParam("id") Long id, Accommodation accommodation) {
         accommodationService.updateAccommodation(id, accommodation);
-        return Response.ok(accommodation).build();
+        return Response.ok(new AccommodationDto(accommodation)).build();
     }
 
     @DELETE
@@ -83,7 +83,7 @@ public class AccommodationController {
 
     @PUT
     @Path("/price/{id}")
-    @PermitAll
+    @RolesAllowed({ "HOST" })
     public Response adjustPrices(@PathParam("id") Long id, AdjustPriceRequest request) {
         Map<LocalDate, Double> newPricesMap = new HashMap<>();
 
@@ -97,7 +97,10 @@ public class AccommodationController {
             );
         });
 
-        accommodationService.adjustPrices(id, newPricesMap);
-        return Response.status(Response.Status.OK).build();
+        var accommodation = accommodationService.adjustPrices(id, newPricesMap);
+        if (accommodation == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(new AccommodationDto(accommodation)).build();
     }
 }
