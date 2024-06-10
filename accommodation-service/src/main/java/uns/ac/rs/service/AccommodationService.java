@@ -59,10 +59,10 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void adjustPrices(Long id, Map<LocalDate, Double> newPrices) {
+    public Accommodation adjustPrices(Long id, Map<LocalDate, Double> newPrices) {
         var accommodationOptional = accommodationRepository.findByIdOptional(id);
         if (accommodationOptional.isEmpty()) {
-            return;
+            return null;
         }
         var accommodation = accommodationOptional.get();
 
@@ -89,5 +89,6 @@ public class AccommodationService {
 
         accommodation.setPriceAdjustments(priceAdjustments);
         accommodationRepository.persist(accommodation);
+        return accommodation;
     }
 }
