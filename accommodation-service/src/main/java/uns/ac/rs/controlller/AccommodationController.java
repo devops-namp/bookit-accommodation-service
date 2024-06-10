@@ -1,5 +1,7 @@
 package uns.ac.rs.controlller;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import uns.ac.rs.entity.Accommodation;
@@ -31,6 +33,7 @@ public class AccommodationController {
 
 
     @GET
+    @PermitAll
     public List<Accommodation> getAll() {
         System.out.println("Dobavi mi sve korisnike");
         stringEmitter.send("dobavi");
@@ -45,6 +48,7 @@ public class AccommodationController {
 
     @GET
     @Path("/{id}")
+    @PermitAll
     public Response getById(@PathParam("id") Long id) {
         Optional<Accommodation> accommodation = accommodationService.getById(id);
         return accommodation.map(value -> Response.ok(value).build())
@@ -52,6 +56,7 @@ public class AccommodationController {
     }
 
     @POST
+    @RolesAllowed({"HOST" })
     public Response addAccommodation(Accommodation accommodation) {
         accommodationService.addAccommodation(accommodation);
         return Response.status(Response.Status.CREATED).entity(accommodation).build();
@@ -59,6 +64,7 @@ public class AccommodationController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({ "HOST" })
     public Response updateAccommodation(@PathParam("id") Long id, Accommodation accommodation) {
         accommodationService.updateAccommodation(id, accommodation);
         return Response.ok(accommodation).build();
@@ -66,6 +72,7 @@ public class AccommodationController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed({ "HOST" })
     public Response deleteAccommodation(@PathParam("id") Long id) {
         accommodationService.deleteAccommodation(id);
         return Response.status(Response.Status.NO_CONTENT).build();
