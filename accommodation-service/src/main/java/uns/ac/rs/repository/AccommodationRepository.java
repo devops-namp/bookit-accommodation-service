@@ -10,7 +10,7 @@ import java.util.List;
 @ApplicationScoped
 public class AccommodationRepository implements PanacheRepository<Accommodation> {
     public List<Accommodation> search(String name, String location, List<String> filters, Integer minGuests, Integer maxGuests,
-                                      LocalDate fromDate, LocalDate toDate, Double price, String priceType) {
+                                      LocalDate fromDate, LocalDate toDate, Double fromPrice,Double toPrice, String priceType) {
         StringBuilder query = new StringBuilder("SELECT a FROM Accommodation a LEFT JOIN a.priceAdjustments pa WHERE 1=1");
 
         if (name != null) {
@@ -27,16 +27,6 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
         }
         if (priceType != null) {
             query.append(" AND a.priceType = :priceType");
-        }
-        if (fromDate != null) {
-            query.append(" AND pa.fromDate >= :fromDate");
-            query.append(" AND pa.toDate >= :fromDate");
-        }
-        if (toDate != null) {
-            query.append(" AND pa.toDate <= :toDate");
-        }
-        if (price != null) {
-            query.append(" AND pa.price <= :price");
         }
         if (filters != null && !filters.isEmpty()) {
             for (int i = 0; i < filters.size(); i++) {
@@ -60,15 +50,6 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
         }
         if (priceType != null) {
             queryBuilder.setParameter("priceType", priceType);
-        }
-        if (fromDate != null) {
-            queryBuilder.setParameter("fromDate", fromDate);
-        }
-        if (toDate != null) {
-            queryBuilder.setParameter("toDate", toDate);
-        }
-        if (price != null) {
-            queryBuilder.setParameter("price", price);
         }
         if (filters != null && !filters.isEmpty()) {
             for (int i = 0; i < filters.size(); i++) {
