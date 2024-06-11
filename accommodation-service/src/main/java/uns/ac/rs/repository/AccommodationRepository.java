@@ -10,8 +10,12 @@ import java.util.List;
 @ApplicationScoped
 public class AccommodationRepository implements PanacheRepository<Accommodation> {
     public List<Accommodation> search(String name, String location, List<String> filters, Integer minGuests, Integer maxGuests,
-                                      LocalDate fromDate, LocalDate toDate, Double fromPrice,Double toPrice, String priceType) {
-        StringBuilder query = new StringBuilder("SELECT a FROM Accommodation a LEFT JOIN a.priceAdjustments pa WHERE 1=1");
+                                      LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice, String priceType) {
+        StringBuilder query = new StringBuilder("SELECT a FROM Accommodation a " +
+                "LEFT JOIN a.priceAdjustments pa " +
+                "LEFT JOIN pa.priceAdjustmentDate pad " +
+                "LEFT JOIN a.reservations r " +
+                "WHERE 1=1");
 
         if (name != null) {
             query.append(" AND a.name LIKE CONCAT('%', :name, '%')");
@@ -34,6 +38,13 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
             }
         }
 
+        if (fromDate != null && toDate != null) {
+            query.append(" AND pad.date BETWEEN :fromDate AND :toDate");
+            query.append(" AND (r.id IS NULL OR r.date NOT BETWEEN :fromDate AND :toDate)");
+        }
+
+        query.append(" GROUP BY a HAVING SUM(pad.price) BETWEEN :fromPrice AND :toPrice");
+
         var queryBuilder = getEntityManager().createQuery(query.toString(), Accommodation.class);
 
         if (name != null) {
@@ -55,6 +66,14 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
             for (int i = 0; i < filters.size(); i++) {
                 queryBuilder.setParameter("filter" + i, filters.get(i));
             }
+        }
+        if (fromDate != null && toDate != null) {
+            queryBuilder.setParameter("fromDate", fromDate);
+            queryBuilder.setParameter("toDate", toDate);
+        }
+        if (fromPrice != null && toPrice != null) {
+            queryBuilder.setParameter("fromPrice", fromPrice);
+            queryBuilder.setParameter("toPrice", toPrice);
         }
 
         return queryBuilder.getResultList();
