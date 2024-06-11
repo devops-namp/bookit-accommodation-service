@@ -25,6 +25,9 @@ public class PriceAdjustmentDate {
     @OneToOne(mappedBy = "priceAdjustmentDate")
     private PriceAdjustment priceAdjustment;
 
+    @OneToOne(mappedBy = "priceAdjustmentDate")
+    private Reservation reservation;
+
     public PriceAdjustmentDate(LocalDate date, double price) {
         this.date = date;
         this.price = price;

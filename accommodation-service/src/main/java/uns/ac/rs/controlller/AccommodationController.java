@@ -5,6 +5,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import uns.ac.rs.controlller.dto.AccommodationDto;
+import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.request.AdjustPriceRequest;
 import uns.ac.rs.service.AccommodationService;
@@ -106,16 +107,16 @@ public class AccommodationController {
     @GET
     @Path("/search")
     @PermitAll
-    public List<AccommodationDto> searchAccommodations(@QueryParam("name") String name,
-                                                    @QueryParam("location") String location,
-                                                    @QueryParam("filters") List<String> filters,
-                                                    @QueryParam("minGuests") Integer minGuests,
-                                                    @QueryParam("maxGuests") Integer maxGuests,
-                                                    @QueryParam("fromDate") String fromDateStr,
-                                                    @QueryParam("toDate") String toDateStr,
-                                                    @QueryParam("toPrice") Double fromPrice,
-                                                       @QueryParam("fromPrice") Double toPrice,
-                                                    @QueryParam("priceType") String priceType) {
+    public List<AccommodationWithPrice> searchAccommodations(@QueryParam("name") String name,
+                                                             @QueryParam("location") String location,
+                                                             @QueryParam("filters") List<String> filters,
+                                                             @QueryParam("minGuests") Integer minGuests,
+                                                             @QueryParam("maxGuests") Integer maxGuests,
+                                                             @QueryParam("fromDate") String fromDateStr,
+                                                             @QueryParam("toDate") String toDateStr,
+                                                             @QueryParam("toPrice") Double fromPrice,
+                                                             @QueryParam("fromPrice") Double toPrice,
+                                                             @QueryParam("priceType") String priceType) {
         LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
         LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
 
