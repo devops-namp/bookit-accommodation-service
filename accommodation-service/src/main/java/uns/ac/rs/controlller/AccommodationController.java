@@ -106,18 +106,19 @@ public class AccommodationController {
     @GET
     @Path("/search")
     @PermitAll
-    public List<Accommodation> searchAccommodations(@QueryParam("name") String name,
+    public List<AccommodationDto> searchAccommodations(@QueryParam("name") String name,
                                                     @QueryParam("location") String location,
                                                     @QueryParam("filters") List<String> filters,
                                                     @QueryParam("minGuests") Integer minGuests,
                                                     @QueryParam("maxGuests") Integer maxGuests,
                                                     @QueryParam("fromDate") String fromDateStr,
                                                     @QueryParam("toDate") String toDateStr,
-                                                    @QueryParam("price") Double price,
+                                                    @QueryParam("toPrice") Double fromPrice,
+                                                       @QueryParam("fromPrice") Double toPrice,
                                                     @QueryParam("priceType") String priceType) {
         LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
         LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
 
-        return accommodationService.searchAccommodations(name, location, filters, minGuests, maxGuests, fromDate, toDate, price, priceType);
+        return accommodationService.searchAccommodations(name, location, filters, minGuests, maxGuests, fromDate, toDate, fromPrice,toPrice, priceType);
     }
 }

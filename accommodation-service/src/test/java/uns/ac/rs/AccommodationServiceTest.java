@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
@@ -175,11 +176,11 @@ class AccommodationServiceTest {
     void testSearch() {
         Accommodation accommodation = new Accommodation();
         List<Accommodation> accommodations = List.of(accommodation);
-        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyString()))
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
                 .thenReturn(accommodations);
 
-        List<Accommodation> result = accommodationService.searchAccommodations("Ocean View", "Miami Beach, FL", List.of("wifi", "free parking", "kitchen"), 1, 4, LocalDate.of(2024, 6, 1), LocalDate.of(2024, 6, 30), 150.00, "price per unit");
+        List<AccommodationDto> result = accommodationService.searchAccommodations("Ocean View", "Miami Beach, FL", List.of("wifi", "free parking", "kitchen"), 1, 4, LocalDate.of(2024, 6, 1), LocalDate.of(2024, 6, 30), 150.00, 500.00, "price per unit");
         assertEquals(1, result.size());
-        verify(accommodationRepository, times(1)).search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyString());
+        verify(accommodationRepository, times(1)).search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(),anyDouble(), anyString());
     }
 }
