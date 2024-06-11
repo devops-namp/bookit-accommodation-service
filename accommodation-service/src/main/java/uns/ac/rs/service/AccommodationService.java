@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import uns.ac.rs.controlller.dto.AccommodationDto;
+import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
@@ -95,12 +96,12 @@ public class AccommodationService {
         return accommodation;
     }
 
-    public List<AccommodationDto> searchAccommodations(String name, String location, List<String> filters, Integer minGuests,
+    public List<AccommodationWithPrice> searchAccommodations(String name, String location, List<String> filters, Integer minGuests,
                                                        Integer maxGuests, LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice,
                                                        String priceType) {
-        List<AccommodationDto> accommodationDtos = new ArrayList<>();
-        for(Accommodation accommodation : accommodationRepository.search(name, location, filters, minGuests, maxGuests, fromDate, toDate, fromPrice,toPrice, priceType)){
-            accommodationDtos.add(new AccommodationDto(accommodation));
+        List<AccommodationWithPrice> accommodationDtos = new ArrayList<>();
+        for(AccommodationWithPrice accommodationWithPrice : accommodationRepository.search(name, location, filters, minGuests, maxGuests, fromDate, toDate, fromPrice,toPrice, priceType)){
+            accommodationDtos.add(accommodationWithPrice);
         }
         return accommodationDtos;
     }

@@ -44,8 +44,8 @@ VALUES
 (2, ARRAY ['https://example.com/image5.jpg', 'https://example.com/image6.jpg']),
 (3, ARRAY ['https://example.com/image7.jpg', 'https://example.com/image8.jpg']);
 
-INSERT INTO reservation (accommodation_id, price_adjustment_date_id)
-VALUES
-(1, 3),
-(2, 6),
-(3, 13);
+-- INSERT INTO reservation (accommodation_id, price_adjustment_date_id)
+-- VALUES
+-- (1, 3),
+-- (2, 6),
+-- (3, 13);
