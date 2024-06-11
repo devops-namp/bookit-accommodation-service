@@ -28,6 +28,9 @@ public class Accommodation {
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL)
     private List<PriceAdjustment> priceAdjustments;
 
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL)
+    private List<Reservation> reservations;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "images", joinColumns = @JoinColumn(name = "accommodation_id"))
     private List<String> images;
