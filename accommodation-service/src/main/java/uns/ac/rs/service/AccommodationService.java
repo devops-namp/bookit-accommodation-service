@@ -96,11 +96,11 @@ public class AccommodationService {
         return accommodation;
     }
 
-    public List<AccommodationWithPrice> searchAccommodations(String name, String location, List<String> filters, Integer minGuests,
-                                                       Integer maxGuests, LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice,
+    public List<AccommodationWithPrice> searchAccommodations(String name, String location, List<String> filters, Integer numGuests
+                                                        , LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice,
                                                        String priceType) {
         List<AccommodationWithPrice> accommodationDtos = new ArrayList<>();
-        for(AccommodationWithPrice accommodationWithPrice : accommodationRepository.search(name, location, filters, minGuests, maxGuests, fromDate, toDate, fromPrice,toPrice, priceType)){
+        for(AccommodationWithPrice accommodationWithPrice : accommodationRepository.search(name, location, filters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType)){
             accommodationDtos.add(accommodationWithPrice);
         }
         return accommodationDtos;
