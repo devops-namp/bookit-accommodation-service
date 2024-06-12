@@ -118,7 +118,18 @@ public class AccommodationController {
                                                              @QueryParam("priceType") String priceType) {
         LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
         LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
-
+        System.out.println("USAOOOO");
+        System.out.println("Parameters:");
+        System.out.println("name: " + name);
+        System.out.println("location: " + location);
+        System.out.println("numGuests: " + numGuests);
+        System.out.println("fromDate: " + fromDate);
+        System.out.println("toDate: " + toDate);
+        System.out.println("toPrice: " + toPrice);
+        System.out.println("fromPrice: " + fromPrice);
+        System.out.println("priceType: " + priceType);
+        for(String filter : filters)
+            System.out.println("filter: " + filter);
         return accommodationService.searchAccommodations(name, location, filters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType);
     }
 }
