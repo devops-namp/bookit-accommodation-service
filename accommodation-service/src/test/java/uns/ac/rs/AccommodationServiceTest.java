@@ -177,11 +177,11 @@ class AccommodationServiceTest {
     void testSearch() {
         AccommodationWithPrice accommodation = new AccommodationWithPrice();
         List<AccommodationWithPrice> accommodations = List.of(accommodation);
-        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
                 .thenReturn(accommodations);
 
-        List<AccommodationWithPrice> result = accommodationService.searchAccommodations("Ocean View", "Miami Beach, FL", List.of("wifi", "free parking", "kitchen"), 1, 4, LocalDate.of(2024, 6, 1), LocalDate.of(2024, 6, 30), 150.00, 500.00, "price per unit");
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations("Ocean View", "Miami Beach, FL", List.of("wifi", "free parking", "kitchen"), 4, LocalDate.of(2024, 6, 1), LocalDate.of(2024, 6, 30), 150.00, 500.00, "price per unit");
         assertEquals(1, result.size());
-        verify(accommodationRepository, times(1)).search(anyString(), anyString(), anyList(), anyInt(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(),anyDouble(), anyString());
+        verify(accommodationRepository, times(1)).search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(),anyDouble(), anyString());
     }
 }
