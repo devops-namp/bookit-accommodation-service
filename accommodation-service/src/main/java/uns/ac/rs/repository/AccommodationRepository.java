@@ -15,6 +15,7 @@ import java.util.List;
 public class AccommodationRepository implements PanacheRepository<Accommodation> {
     public List<AccommodationWithPrice> search(String name, String location, List<String> filters, Integer numGuests,
                                                LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice, String priceType) {
+        System.out.println("USAO U REPO");
         StringBuilder query = new StringBuilder("SELECT a FROM Accommodation a " +
                 "LEFT JOIN a.priceAdjustments pa " +
                 "LEFT JOIN pa.priceAdjustmentDate pad " +
@@ -44,10 +45,6 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
             long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(fromDate, toDate) + 1;
             query.append(" AND NOT EXISTS (SELECT 1 FROM Reservation r WHERE r.accommodation.id = a.id AND r.priceAdjustmentDate.date BETWEEN :fromDate AND :toDate)");
             query.append(" AND (SELECT COUNT(*) FROM PriceAdjustment pa WHERE pa.accommodation.id = a.id AND pa.priceAdjustmentDate.date BETWEEN :fromDate AND :toDate)=").append(daysBetween);
-        } else if (fromDate != null) {
-            query.append(" AND NOT EXISTS (SELECT 1 FROM Reservation r WHERE r.accommodation.id = a.id AND r.priceAdjustmentDate.date >= :fromDate)");
-        } else if (toDate != null) {
-            query.append(" AND NOT EXISTS (SELECT 1 FROM Reservation r WHERE r.accommodation.id = a.id AND r.priceAdjustmentDate.date <= :toDate)");
         }
 
         query.append(" GROUP BY a.id");
@@ -80,6 +77,7 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
 
         List<Object[]> results = queryBuilder.getResultList();
         List<AccommodationWithPrice> accommodationsWithPrices = new ArrayList<>();
+        System.out.println("DOSAO DO POSLEDNJEG FORA ZA CENE");
         for (Object[] result : results) {
             Accommodation accommodation = (Accommodation) result[0];
             double totalPrice = 0.0;
