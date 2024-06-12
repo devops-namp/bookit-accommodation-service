@@ -110,16 +110,15 @@ public class AccommodationController {
     public List<AccommodationWithPrice> searchAccommodations(@QueryParam("name") String name,
                                                              @QueryParam("location") String location,
                                                              @QueryParam("filters") List<String> filters,
-                                                             @QueryParam("minGuests") Integer minGuests,
-                                                             @QueryParam("maxGuests") Integer maxGuests,
+                                                             @QueryParam("numGuests") Integer numGuests,
                                                              @QueryParam("fromDate") String fromDateStr,
                                                              @QueryParam("toDate") String toDateStr,
-                                                             @QueryParam("toPrice") Double fromPrice,
-                                                             @QueryParam("fromPrice") Double toPrice,
+                                                             @QueryParam("toPrice") Double toPrice,
+                                                             @QueryParam("fromPrice") Double fromPrice,
                                                              @QueryParam("priceType") String priceType) {
         LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
         LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
 
-        return accommodationService.searchAccommodations(name, location, filters, minGuests, maxGuests, fromDate, toDate, fromPrice,toPrice, priceType);
+        return accommodationService.searchAccommodations(name, location, filters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType);
     }
 }
