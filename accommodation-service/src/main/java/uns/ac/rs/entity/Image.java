@@ -20,15 +20,11 @@ public class Image {
     private Long id;
 
     @Lob
-    @Column(name = "image_data", columnDefinition = "BYTEA")
+    @Column(name = "image_data", columnDefinition = "bytea")
     private byte[] imageData;
 
     @ManyToOne
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
 
-    public Image(ImageDto imageDto) {
-        this.imageData = imageDto.getImage();
-        this.accommodation = new Accommodation(imageDto.getAccommodationDto());
-    }
 }

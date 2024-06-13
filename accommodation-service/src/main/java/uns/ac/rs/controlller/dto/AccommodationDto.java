@@ -7,6 +7,7 @@ import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.Image;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Getter
@@ -35,12 +36,7 @@ public class AccommodationDto {
             accommodation.getPriceAdjustments() != null ?
                 accommodation.getPriceAdjustments().stream().map(PriceAdjustmentDto::new).toList() : new ArrayList<>(),
             accommodation.getImages() != null ?
-                    accommodation.getImages().stream().map(image -> new ImageDto(null, image.getImageData())).toList() : new ArrayList<>()
+                    accommodation.getImages().stream().map(image -> new ImageDto(Base64.getEncoder().encodeToString(image.getImageData()))).toList() : new ArrayList<>()
         );
-
-        List<ImageDto> imageDtos = accommodation.getImages() != null ?
-                accommodation.getImages().stream().map(image -> new ImageDto(this, image.getImageData())).toList() : new ArrayList<>();
-
-        this.setImages(imageDtos);
     }
 }

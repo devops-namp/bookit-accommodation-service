@@ -37,6 +37,7 @@ public class AccommodationService {
 
     @Transactional
     public void addAccommodation(Accommodation accommodation) {
+
         accommodationRepository.persist(accommodation);
     }
 
