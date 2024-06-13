@@ -64,7 +64,11 @@ public class AccommodationController {
 //    @RolesAllowed({"HOST" })
     @PermitAll // samo privremeno
     public Response addAccommodation(AccommodationDto accommodationDto) {
-        System.out.println("USLI U ADD ACCOMM");
+        System.out.println("_________________AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA__________________________________________");
+        System.out.println(accommodationDto.getImages().get(0).getImageAsBytes().toString());
+        System.out.println("_________________MAJMUNE__________________________________________");
+        System.out.println(accommodationDto.getImages().get(0).getBase64Image());
+        System.out.println("_________________BBBBBBBBBBBBBBBBBBBBBBBBBBBB__________________________________________");
         Accommodation accommodation = new Accommodation(accommodationDto);
         accommodationService.addAccommodation(accommodation);
         return Response.status(Response.Status.CREATED).entity(accommodationDto).build();
