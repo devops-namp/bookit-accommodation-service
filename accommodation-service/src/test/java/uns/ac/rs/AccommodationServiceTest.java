@@ -74,13 +74,15 @@ class AccommodationServiceTest {
     @Test
     void testUpdateAccommodation() {
         Accommodation existingAccommodation = new Accommodation();
+        existingAccommodation.setHostUsername("host");
         existingAccommodation.setId(1L);
         Accommodation updatedAccommodation = new Accommodation();
+
         updatedAccommodation.setName("Updated Name");
 
         when(accommodationRepository.findByIdOptional(1L)).thenReturn(Optional.of(existingAccommodation));
 
-        accommodationService.updateAccommodation(1L, updatedAccommodation);
+        accommodationService.updateAccommodation(1L, updatedAccommodation, "host");
 
         verify(accommodationRepository, times(1)).findByIdOptional(1L);
         verify(accommodationRepository, times(1)).persist(existingAccommodation);

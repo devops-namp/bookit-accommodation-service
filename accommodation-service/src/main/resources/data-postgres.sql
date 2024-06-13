@@ -1,8 +1,8 @@
-INSERT INTO public."bookit-accommodation" (name, location, filters, minguests, maxguests, pricetype)
+INSERT INTO public."bookit-accommodation" (name, hostusername, location, filters, minguests, maxguests, pricetype)
 VALUES
-('Mountain Cabin Retreat', 'Aspen, CO', 'wifi,free_parking,fireplace', 2, 6, 'price_per_person'),
-('City Center Studio', 'New York, NY', 'wifi,free_parking', 1, 2, 'price_per_person'),
-('Beachfront Condo', 'Malibu, CA', 'wifi,free_parking,pool', 1, 4, 'price_per_unit');
+('Mountain Cabin Retreat', 'username2', 'Aspen, CO', 'wifi,free_parking,fireplace', 2, 6, 'price_per_person'),
+('City Center Studio',  'host2', 'New York, NY', 'wifi,free_parking', 1, 2, 'price_per_person'),
+('Beachfront Condo', 'host2', 'Malibu, CA', 'wifi,free_parking,pool', 1, 4, 'price_per_unit');
 
 INSERT INTO priceadjustmentdate (date, price)
 VALUES

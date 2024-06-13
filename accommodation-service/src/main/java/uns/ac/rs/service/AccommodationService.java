@@ -45,8 +45,11 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void updateAccommodation(Long id, Accommodation updatedAccommodation) {
+    public void updateAccommodation(Long id, Accommodation updatedAccommodation, String username) {
         accommodationRepository.findByIdOptional(id).ifPresent(existingAccommodation -> {
+            if (!existingAccommodation.getHostUsername().equals(username)) {
+                return;
+            }
             existingAccommodation.setName(updatedAccommodation.getName());
             existingAccommodation.setLocation(updatedAccommodation.getLocation());
             existingAccommodation.setFilters(updatedAccommodation.getFilters());
