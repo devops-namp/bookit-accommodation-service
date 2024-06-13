@@ -1,6 +1,7 @@
 package uns.ac.rs;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -39,8 +40,10 @@ class AccommodationTest {
     }
 
     @Test
+    @TestSecurity(user = "host", roles = "HOST")
     void testAddAccommodation() {
         Accommodation accommodation = new Accommodation();
+        accommodation.setImages(List.of());
         accommodation.setName("Test Accommodation");
         accommodation.setLocation("Test Location");
 
@@ -54,6 +57,7 @@ class AccommodationTest {
     }
 
     @Test
+    @TestSecurity(user = "host", roles = "HOST")
     void testUpdateAccommodation() {
         Accommodation updatedAccommodation = new Accommodation();
         updatedAccommodation.setName("Updated Accommodation");
@@ -68,8 +72,10 @@ class AccommodationTest {
     }
 
     @Test
+    @TestSecurity(user = "host", roles = "HOST")
     void testDeleteAccommodation() {
         Accommodation accommodation = new Accommodation();
+        accommodation.setImages(List.of());
         accommodation.setName("Test Accommodation");
         accommodation.setLocation("Test Location");
 
@@ -88,6 +94,7 @@ class AccommodationTest {
     }
 
     @Test
+    @TestSecurity(user = "host", roles = "HOST")
     void testAdjustPrices() {
         var request = new AdjustPriceRequest();
 

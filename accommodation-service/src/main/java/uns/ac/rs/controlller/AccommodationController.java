@@ -1,5 +1,6 @@
 package uns.ac.rs.controlller;
 
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -14,6 +15,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.logging.Logger;
 
 import jakarta.ws.rs.core.MediaType;
 
@@ -33,8 +35,13 @@ public class AccommodationController {
     AccommodationService accommodationService;
 
     @Inject
+    SecurityIdentity securityIdentity;
+
+    @Inject
     @Channel("filter-request-queue")
     Emitter<String> stringEmitter;
+
+    Logger LOG = Logger.getLogger(String.valueOf(AccommodationController.class));
 
 
     @GET
@@ -61,11 +68,15 @@ public class AccommodationController {
     }
 
     @POST
-//    @RolesAllowed({"HOST" })
-    @PermitAll // samo privremeno
+    @RolesAllowed({"HOST"})
     public Response addAccommodation(AccommodationDto accommodationDto) {
+        LOG.info("Adding accommodation");
+        String username = securityIdentity.getPrincipal().getName();
+        LOG.info("Adding accommodation for host: " + username);
         Accommodation accommodation = new Accommodation(accommodationDto);
+        accommodation.setHostUsername(username);
         accommodation = accommodationService.addAccommodation(accommodation);
+        LOG.info("Added accommodation with ID: " + accommodation.getId());
         accommodationDto.setId(accommodation.getId());
         return Response.status(Response.Status.CREATED).entity(accommodationDto).build();
     }
@@ -74,7 +85,8 @@ public class AccommodationController {
     @Path("/{id}")
     @RolesAllowed({ "HOST" })
     public Response updateAccommodation(@PathParam("id") Long id, Accommodation accommodation) {
-        accommodationService.updateAccommodation(id, accommodation);
+        String username = securityIdentity.getPrincipal().getName();
+        accommodationService.updateAccommodation(id, accommodation, username);
         return Response.ok(new AccommodationDto(accommodation)).build();
     }
 

@@ -23,6 +23,7 @@ public class AccommodationDto {
     private String priceType;
     private List<PriceAdjustmentDto> priceAdjustments;
     private List<ImageDto> images;
+    private String hostUsername;
 
     public AccommodationDto(Accommodation accommodation) {
         this(
@@ -36,7 +37,8 @@ public class AccommodationDto {
             accommodation.getPriceAdjustments() != null ?
                 accommodation.getPriceAdjustments().stream().map(PriceAdjustmentDto::new).toList() : new ArrayList<>(),
             accommodation.getImages() != null ?
-                    accommodation.getImages().stream().map(image -> new ImageDto(image.getImageData())).toList() : new ArrayList<>()
+                    accommodation.getImages().stream().map(image -> new ImageDto(image.getImageData())).toList() : new ArrayList<>(),
+            accommodation.getHostUsername()
         );
     }
 }
