@@ -27,10 +27,12 @@ public class AccommodationService {
     @Inject
     PriceAdjustmentDateRepository priceAdjustmentDateRepository;
 
+    @Transactional
     public List<Accommodation> getAll() {
         return accommodationRepository.listAll();
     }
 
+    @Transactional
     public Optional<Accommodation> getById(Long id) {
         return accommodationRepository.findByIdOptional(id);
     }
