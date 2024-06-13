@@ -64,13 +64,9 @@ public class AccommodationController {
 //    @RolesAllowed({"HOST" })
     @PermitAll // samo privremeno
     public Response addAccommodation(AccommodationDto accommodationDto) {
-        System.out.println("_________________AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA__________________________________________");
-        System.out.println(accommodationDto.getImages().get(0).getImageAsBytes().toString());
-        System.out.println("_________________MAJMUNE__________________________________________");
-        System.out.println(accommodationDto.getImages().get(0).getBase64Image());
-        System.out.println("_________________BBBBBBBBBBBBBBBBBBBBBBBBBBBB__________________________________________");
         Accommodation accommodation = new Accommodation(accommodationDto);
-        accommodationService.addAccommodation(accommodation);
+        accommodation = accommodationService.addAccommodation(accommodation);
+        accommodationDto.setId(accommodation.getId());
         return Response.status(Response.Status.CREATED).entity(accommodationDto).build();
     }
 
@@ -95,8 +91,10 @@ public class AccommodationController {
     @RolesAllowed({ "HOST" })
     public Response adjustPrices(@PathParam("id") Long id, AdjustPriceRequest request) {
         Map<LocalDate, Double> newPricesMap = new HashMap<>();
+        System.out.println("Adding prices for accommodation: " + id);
 
         request.getPricesPerInterval().forEach(intervalPrice -> {
+
             var startDate = intervalPrice.getStartDate();
             var endDate = intervalPrice.getEndDate();
             var price = intervalPrice.getPrice();
@@ -104,6 +102,7 @@ public class AccommodationController {
             startDate.datesUntil(endDate.plusDays(1)).forEach(date ->
                 newPricesMap.put(date, price)
             );
+            System.out.println("Added price for interval: " + startDate + " - " + endDate + " : " + price);
         });
 
         var accommodation = accommodationService.adjustPrices(id, newPricesMap);
