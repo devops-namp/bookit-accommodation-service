@@ -1,5 +1,5 @@
 INSERT INTO public."bookit-accommodation" (name, location, filters, minguests, maxguests, pricetype)
-VALUES ('Ocean View Apartment', 'Miami Beach, FL', 'wifi,free parking,kitchen', 1, 4, 'price per unit');
+VALUES ('Ocean View Apartment', 'Miami Beach, FL', 'wifi,free_parking,kitchen', 1, 4, 'price_per_unit');
 
 INSERT INTO priceadjustmentdate (date, price)
 VALUES ('2024-06-10', 200);

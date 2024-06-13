@@ -180,7 +180,7 @@ class AccommodationServiceTest {
         when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
                 .thenReturn(accommodations);
 
-        List<AccommodationWithPrice> result = accommodationService.searchAccommodations("Ocean View", "Miami Beach, FL", List.of("wifi", "free parking", "kitchen"), 4, LocalDate.of(2024, 6, 1), LocalDate.of(2024, 6, 30), 150.00, 500.00, "price per unit");
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations("Ocean View", "Miami Beach, FL", List.of("wifi", "free_parking", "kitchen"), 4, LocalDate.of(2024, 6, 1), LocalDate.of(2024, 6, 30), 150.00, 500.00, "price_per_unit");
         assertEquals(1, result.size());
         verify(accommodationRepository, times(1)).search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(),anyDouble(), anyString());
     }

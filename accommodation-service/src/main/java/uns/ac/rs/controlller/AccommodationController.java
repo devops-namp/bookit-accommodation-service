@@ -60,10 +60,13 @@ public class AccommodationController {
     }
 
     @POST
-    @RolesAllowed({"HOST" })
-    public Response addAccommodation(Accommodation accommodation) {
+//    @RolesAllowed({"HOST" })
+    @PermitAll // samo privremeno
+    public Response addAccommodation(AccommodationDto accommodationDto) {
+        System.out.println("USLI U ADD ACCOMM");
+        Accommodation accommodation = new Accommodation(accommodationDto);
         accommodationService.addAccommodation(accommodation);
-        return Response.status(Response.Status.CREATED).entity(new AccommodationDto(accommodation)).build();
+        return Response.status(Response.Status.CREATED).entity(accommodationDto).build();
     }
 
     @PUT
