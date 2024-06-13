@@ -1,7 +1,7 @@
 INSERT INTO public."bookit-accommodation" (name, location, filters, minguests, maxguests, pricetype)
 VALUES
-('Mountain Cabin Retreat', 'Aspen, CO', 'wifi,free_parking,kitchen,fireplace', 2, 6, 'price_per_person'),
-('City Center Studio', 'New York, NY', 'wifi,free_parking,air_conditioning', 1, 2, 'price_per_person'),
+('Mountain Cabin Retreat', 'Aspen, CO', 'wifi,free_parking,fireplace', 2, 6, 'price_per_person'),
+('City Center Studio', 'New York, NY', 'wifi,free_parking', 1, 2, 'price_per_person'),
 ('Beachfront Condo', 'Malibu, CA', 'wifi,free_parking,pool', 1, 4, 'price_per_unit');
 
 INSERT INTO priceadjustmentdate (date, price)
@@ -44,9 +44,10 @@ VALUES
 
 INSERT INTO images (accommodation_id, images)
 VALUES
-(1, ARRAY ['https://example.com/image3.jpg', 'https://example.com/image4.jpg']),
-(2, ARRAY ['https://example.com/image5.jpg', 'https://example.com/image6.jpg']),
-(3, ARRAY ['https://example.com/image7.jpg', 'https://example.com/image8.jpg']);
+(1, ARRAY['https://cf2.bstatic.com/xdata/images/hotel/max1024x768/563377228.jpg?k=9d1d1414792cb45cdbaf2035461e7e8d2c81cce9edc7d5ee1d5a149859779c51&o=&hp=1']),
+(2, ARRAY['https://cf2.bstatic.com/xdata/images/hotel/max1024x768/415251471.jpg?k=f0ea024f8ca6635a3705626675fce84d9f15e0b4d24e4cfc2b1670557c8c6a54&o=&hp=1']),
+(3, ARRAY['https://cf2.bstatic.com/xdata/images/hotel/max1024x768/500427863.jpg?k=a30fb149bc14d56db364879b8a9ca4ad134cffbc85a7e95a8557b0ca3177119b&o=&hp=1']);
+
 
 INSERT INTO reservation (accommodation_id, price_adjustment_date_id)
 VALUES
