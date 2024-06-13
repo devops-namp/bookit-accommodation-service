@@ -37,8 +37,9 @@ public class AccommodationService {
 
     @Transactional
     public void addAccommodation(Accommodation accommodation) {
-
+        System.out.println("USAO U GLUPI SERVIS");
         accommodationRepository.persist(accommodation);
+        System.out.println("Izasao iz GLUPI SERVIS");
     }
 
     @Transactional
@@ -97,6 +98,7 @@ public class AccommodationService {
         return accommodation;
     }
 
+    @Transactional
     public List<AccommodationWithPrice> searchAccommodations(String name, String location, List<String> filters, Integer numGuests
                                                         , LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice,
                                                        String priceType) {
