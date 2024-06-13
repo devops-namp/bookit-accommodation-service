@@ -36,10 +36,10 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void addAccommodation(Accommodation accommodation) {
-        System.out.println("USAO U GLUPI SERVIS");
+    public Accommodation addAccommodation(Accommodation accommodation) {
         accommodationRepository.persist(accommodation);
-        System.out.println("Izasao iz GLUPI SERVIS");
+        System.out.println("Assigned ID: " + accommodation.getId());
+        return accommodation;
     }
 
     @Transactional
