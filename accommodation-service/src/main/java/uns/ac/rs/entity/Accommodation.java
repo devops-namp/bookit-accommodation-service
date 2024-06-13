@@ -28,6 +28,7 @@ public class Accommodation {
     private int minGuests;
     private int maxGuests;
     private String priceType;
+    private String hostUsername;
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PriceAdjustment> priceAdjustments;
