@@ -50,7 +50,7 @@ public class Accommodation {
         this.images = new ArrayList<>();
         for (ImageDto imageData : accommodationDto.getImages()) {
             Image image = new Image();
-            image.setImageData(imageData.getImage());
+            image.setImageData(imageData.getImageAsBytes());
             image.setAccommodation(this);
             this.images.add(image);
         }

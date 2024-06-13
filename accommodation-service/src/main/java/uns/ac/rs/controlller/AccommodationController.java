@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
+import uns.ac.rs.controlller.dto.ImageDto;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.request.AdjustPriceRequest;
 import uns.ac.rs.service.AccommodationService;
