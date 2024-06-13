@@ -29,10 +29,10 @@ public class Accommodation {
     private int maxGuests;
     private String priceType;
 
-    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PriceAdjustment> priceAdjustments;
 
-    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Reservation> reservations;
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
