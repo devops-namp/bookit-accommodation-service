@@ -20,7 +20,7 @@ public class Image {
     private Long id;
 
     @Lob
-    @Column(name = "image_data", columnDefinition = "bytea")
+    @Column(name = "image_data")
     private byte[] imageData;
 
     @ManyToOne
