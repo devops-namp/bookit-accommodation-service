@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uns.ac.rs.controlller.dto.AccommodationDto;
+import uns.ac.rs.controlller.dto.ImageDto;
 import uns.ac.rs.controlller.dto.PriceAdjustmentDto;
 
 import java.util.ArrayList;
@@ -34,9 +35,8 @@ public class Accommodation {
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL)
     private List<Reservation> reservations;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "images", joinColumns = @JoinColumn(name = "accommodation_id"))
-    private List<String> images;
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Image> images;
 
     public Accommodation(AccommodationDto accommodationDto) {
         this.id = accommodationDto.getId();
@@ -46,7 +46,14 @@ public class Accommodation {
         this.minGuests = accommodationDto.getMinGuests();
         this.maxGuests = accommodationDto.getMaxGuests();
         this.priceType = accommodationDto.getPriceType();
-        this.images = accommodationDto.getImages();
+
+        this.images = new ArrayList<>();
+        for (ImageDto imageData : accommodationDto.getImages()) {
+            Image image = new Image();
+            image.setImageData(imageData.getImage());
+            image.setAccommodation(this);
+            this.images.add(image);
+        }
 
         if (accommodationDto.getPriceAdjustments() != null) {
             this.priceAdjustments = new ArrayList<>();

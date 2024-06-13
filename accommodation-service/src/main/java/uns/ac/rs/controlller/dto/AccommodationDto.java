@@ -2,12 +2,15 @@ package uns.ac.rs.controlller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import uns.ac.rs.entity.Accommodation;
+import uns.ac.rs.entity.Image;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class AccommodationDto {
     private Long id;
@@ -18,7 +21,7 @@ public class AccommodationDto {
     private int maxGuests;
     private String priceType;
     private List<PriceAdjustmentDto> priceAdjustments;
-    private List<String> images;
+    private List<ImageDto> images;
 
     public AccommodationDto(Accommodation accommodation) {
         this(
@@ -31,7 +34,13 @@ public class AccommodationDto {
             accommodation.getPriceType(),
             accommodation.getPriceAdjustments() != null ?
                 accommodation.getPriceAdjustments().stream().map(PriceAdjustmentDto::new).toList() : new ArrayList<>(),
-            accommodation.getImages()
+            accommodation.getImages() != null ?
+                    accommodation.getImages().stream().map(image -> new ImageDto(null, image.getImageData())).toList() : new ArrayList<>()
         );
+
+        List<ImageDto> imageDtos = accommodation.getImages() != null ?
+                accommodation.getImages().stream().map(image -> new ImageDto(this, image.getImageData())).toList() : new ArrayList<>();
+
+        this.setImages(imageDtos);
     }
 }
