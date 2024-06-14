@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,7 +25,8 @@ public class Reservation {
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "price_adjustment_date_id", referencedColumnName = "id")
-    private PriceAdjustmentDate priceAdjustmentDate;
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PriceAdjustmentDate> priceAdjustmentDate;
+
+    private String guestUsername;
 }

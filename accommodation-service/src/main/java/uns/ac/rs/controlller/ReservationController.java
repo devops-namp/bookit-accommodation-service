@@ -4,6 +4,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import uns.ac.rs.controlller.dto.ReservationDto;
+import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.Reservation;
 import uns.ac.rs.service.ReservationService;
 
@@ -32,9 +34,10 @@ public class ReservationController {
     }
 
     @POST
-    public Response create(Reservation reservation) {
-        Reservation created = reservationService.create(reservation);
-        return Response.status(Response.Status.CREATED).entity(created).build();
+    public Response create(ReservationDto reservationDto) {
+        Reservation created = reservationService.create(reservationDto);
+        ReservationDtoToSend reservationDtoToSend = new ReservationDtoToSend(created,reservationDto.getFromDate(), reservationDto.getToDate());
+        return Response.status(Response.Status.CREATED).entity(reservationDtoToSend).build();
     }
 
     @PUT

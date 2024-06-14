@@ -4,25 +4,33 @@ VALUES
 ('City Center Studio',  'host2', 'New York, NY', 'wifi,parking,tv', 1, 2, 'price_per_person'),
 ('Beachfront Condo', 'host2', 'Malibu, CA', 'wifi,parking,pool', 1, 4, 'price_per_unit');
 
-INSERT INTO priceadjustmentdate (date, price)
+
+INSERT INTO reservation (accommodation_id, guestusername)
 VALUES
-('2024-07-10', 150),
-('2024-07-11', 150),
-('2024-07-12', 150),
-('2024-07-13', 150),
-('2024-07-14', 150),
+(1, 'guestUser1'),
+(1, 'guestUser2');
 
-('2024-07-10', 100),
-('2024-07-11', 100),
-('2024-07-12', 100),
-('2024-07-13', 100),
-('2024-07-14', 100),
 
-('2024-07-12', 250),
-('2024-07-13', 250),
-('2024-07-14', 250),
-('2024-07-15', 250),
-('2024-07-16', 250);
+
+INSERT INTO priceadjustmentdate (date, price,reservation_id)
+VALUES
+('2024-07-10', 150,1),
+('2024-07-11', 150,1),
+('2024-07-12', 150,2),
+('2024-07-13', 150,2),
+('2024-07-14', 150,null),
+
+('2024-07-10', 100,null),
+('2024-07-11', 100,null),
+('2024-07-12', 100,null),
+('2024-07-13', 100,null),
+('2024-07-14', 100,null),
+
+('2024-07-12', 250,null),
+('2024-07-13', 250,null),
+('2024-07-14', 250,null),
+('2024-07-15', 250,null),
+('2024-07-16', 250,null);
 
 INSERT INTO priceadjustment (accommodation_id, price_adjustment_date_id)
 VALUES
@@ -47,8 +55,3 @@ VALUES
 -- (1, decode('9d1d1414792cb45cdbaf2035461e7e8d2c81cce9edc7d5ee1d5a149859779c51', 'hex')),
 -- (2, decode('f0ea024f8ca6635a3705626675fce84d9f15e0b4d24e4cfc2b1670557c8c6a54', 'hex')),
 -- (3, decode('a30fb149bc14d56db364879b8a9ca4ad134cffbc85a7e95a8557b0ca3177119b', 'hex'));
-
-INSERT INTO reservation (accommodation_id, price_adjustment_date_id)
-VALUES
-(1, 2),
-(1, 3);
