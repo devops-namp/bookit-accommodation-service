@@ -146,8 +146,8 @@ public class AccommodationController {
         System.out.println("toPrice: " + toPrice);
         System.out.println("fromPrice: " + fromPrice);
         System.out.println("priceType: " + priceType);
-        for(String filter : filters)
-            System.out.println("filter: " + filter);
-        return accommodationService.searchAccommodations(name, location, filters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType);
+        System.out.println("filtersssss: " + Arrays.toString(filters.get(0).split(",")));
+        List<String> correctFlters = Arrays.asList(filters.get(0).split(","));
+        return accommodationService.searchAccommodations(name, location, correctFlters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType);
     }
 }
