@@ -45,3 +45,6 @@ nb-configuration.xml
 src/main/resources/privatekey.pem
 src/main/resources/publickey.pem
 
+src/test/resources/privatekey.pem
+src/test/resources/publickey.pem
+
