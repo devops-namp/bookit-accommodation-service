@@ -25,7 +25,8 @@ public class PriceAdjustmentDate {
     @OneToOne(mappedBy = "priceAdjustmentDate")
     private PriceAdjustment priceAdjustment;
 
-    @OneToOne(mappedBy = "priceAdjustmentDate")
+    @ManyToOne
+    @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
     public PriceAdjustmentDate(LocalDate date, double price) {
