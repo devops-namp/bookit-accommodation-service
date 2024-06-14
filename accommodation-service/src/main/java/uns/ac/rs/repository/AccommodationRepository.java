@@ -19,7 +19,6 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
                 "LEFT JOIN a.priceAdjustments pa " +
                 "LEFT JOIN pa.priceAdjustmentDate pad " +
                 "LEFT JOIN a.reservations r " +
-                "LEFT JOIN r.priceAdjustmentDate rad " +
                 "WHERE 1=1");
 
         if (name != null) {
@@ -42,8 +41,8 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
 
         if (fromDate != null && toDate != null) {
             long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(fromDate, toDate) + 1;
-            query.append(" AND NOT EXISTS (SELECT 1 FROM Reservation r WHERE r.accommodation.id = a.id AND r.priceAdjustmentDate.date BETWEEN :fromDate AND :toDate)");
-            query.append(" AND (SELECT COUNT(*) FROM PriceAdjustment pa WHERE pa.accommodation.id = a.id AND pa.priceAdjustmentDate.date BETWEEN :fromDate AND :toDate)=").append(daysBetween);
+            query.append(" AND NOT EXISTS (SELECT 1 FROM PriceAdjustment pa2 WHERE pa2.accommodation.id = a.id AND pa2.priceAdjustmentDate.date BETWEEN :fromDate AND :toDate AND pa2.priceAdjustmentDate.reservation.id IS NOT NULL)");
+            query.append(" AND (SELECT COUNT(pa3) FROM PriceAdjustment pa3 WHERE pa3.accommodation.id = a.id AND pa3.priceAdjustmentDate.date BETWEEN :fromDate AND :toDate)=").append(daysBetween);
         }
 
         query.append(" GROUP BY a.id");
@@ -93,9 +92,6 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
                     totalPrice += pad.getPrice();
                 }
             }
-            System.out.println(fromPrice);
-            System.out.println(toPrice);
-            System.out.println(totalPrice);
             if ((fromPrice == null || totalPrice >= fromPrice) && (toPrice == null || totalPrice <= toPrice)) {
                 accommodationsWithPrices.add(new AccommodationWithPrice(new AccommodationDto(accommodation), totalPrice));
             }
@@ -103,4 +99,7 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
 
         return accommodationsWithPrices;
     }
+
+
+
 }
