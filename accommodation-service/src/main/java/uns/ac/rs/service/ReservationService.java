@@ -12,6 +12,8 @@ import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,9 +52,16 @@ public class ReservationService {
         reservation.setGuestUsername(reservationDto.getGuestUsername());
 
         List<PriceAdjustment> priceAdjustments = priceAdjustmentRepository.findByAccommodationId(accommodation.getId());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate fromDate = LocalDate.parse(reservationDto.getFromDate(), formatter).minusDays(1);
+        LocalDate toDate = LocalDate.parse(reservationDto.getToDate(), formatter).plusDays(1);
+
+
         for (PriceAdjustment pa : priceAdjustments) {
             PriceAdjustmentDate pad = pa.getPriceAdjustmentDate();
-            pad.setReservation(reservation);
+            if(pad.getDate().isAfter(fromDate) && pad.getDate().isBefore(toDate))
+                pad.setReservation(reservation);
         }
         reservation.setPriceAdjustmentDate(priceAdjustments.stream().map(PriceAdjustment::getPriceAdjustmentDate).toList());
         reservationRepository.persist(reservation);
