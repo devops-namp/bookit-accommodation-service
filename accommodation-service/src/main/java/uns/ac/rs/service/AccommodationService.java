@@ -108,7 +108,6 @@ public class AccommodationService {
                                                         , LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice,
                                                        String priceType) {
         List<AccommodationWithPrice> accommodationDtos = new ArrayList<>();
-        System.out.println("USAO U SERVIS");
         for(AccommodationWithPrice accommodationWithPrice : accommodationRepository.search(name, location, filters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType)){
             accommodationDtos.add(accommodationWithPrice);
         }

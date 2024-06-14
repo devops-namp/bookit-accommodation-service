@@ -137,7 +137,6 @@ public class AccommodationController {
                                                              @QueryParam("priceType") String priceType) {
         LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
         LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
-        System.out.println("USAOOOO");
         System.out.println("Parameters:");
         System.out.println("name: " + name);
         System.out.println("location: " + location);

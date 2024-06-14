@@ -1,28 +1,28 @@
 INSERT INTO public."bookit-accommodation" (name, hostusername, location, filters, minguests, maxguests, pricetype)
 VALUES
-('Mountain Cabin Retreat', 'username2', 'Aspen, CO', 'wifi,free_parking,fireplace', 2, 6, 'price_per_person'),
-('City Center Studio',  'host2', 'New York, NY', 'wifi,free_parking', 1, 2, 'price_per_person'),
-('Beachfront Condo', 'host2', 'Malibu, CA', 'wifi,free_parking,pool', 1, 4, 'price_per_unit');
+('Mountain Cabin Retreat', 'username2', 'Aspen, CO', 'wifi,parking,fireplace,bath', 2, 6, 'price_per_person'),
+('City Center Studio',  'host2', 'New York, NY', 'wifi,parking,tv', 1, 2, 'price_per_person'),
+('Beachfront Condo', 'host2', 'Malibu, CA', 'wifi,parking,pool', 1, 4, 'price_per_unit');
 
 INSERT INTO priceadjustmentdate (date, price)
 VALUES
-('2024-06-10', 150),
-('2024-06-11', 150),
-('2024-06-12', 150),
-('2024-06-13', 150),
-('2024-06-14', 150),
+('2024-07-10', 150),
+('2024-07-11', 150),
+('2024-07-12', 150),
+('2024-07-13', 150),
+('2024-07-14', 150),
 
-('2024-06-10', 100),
-('2024-06-11', 100),
-('2024-06-12', 100),
-('2024-06-13', 100),
-('2024-06-14', 100),
+('2024-07-10', 100),
+('2024-07-11', 100),
+('2024-07-12', 100),
+('2024-07-13', 100),
+('2024-07-14', 100),
 
-('2024-06-12', 250),
-('2024-06-13', 250),
-('2024-06-14', 250),
-('2024-06-15', 250),
-('2024-06-16', 250);
+('2024-07-12', 250),
+('2024-07-13', 250),
+('2024-07-14', 250),
+('2024-07-15', 250),
+('2024-07-16', 250);
 
 INSERT INTO priceadjustment (accommodation_id, price_adjustment_date_id)
 VALUES
