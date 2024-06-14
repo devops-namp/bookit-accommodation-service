@@ -169,7 +169,7 @@ class AccommodationTest {
         given()
                 .queryParam("name", "Ocean View")
                 .queryParam("location", "Miami Beach, FL")
-                .queryParam("filters", "wifi,free parking,kitchen")
+                .queryParam("filters", "wifi,parking,kitchen")
                 .queryParam("minGuests", 1)
                 .queryParam("maxGuests", 4)
                 .queryParam("fromDate", "2024-06-01")
