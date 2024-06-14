@@ -15,7 +15,6 @@ import java.util.List;
 public class AccommodationRepository implements PanacheRepository<Accommodation> {
     public List<AccommodationWithPrice> search(String name, String location, List<String> filters, Integer numGuests,
                                                LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice, String priceType) {
-        System.out.println("USAO U REPO");
         StringBuilder query = new StringBuilder("SELECT a FROM Accommodation a " +
                 "LEFT JOIN a.priceAdjustments pa " +
                 "LEFT JOIN pa.priceAdjustmentDate pad " +
@@ -77,7 +76,6 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
 
         List<Object[]> results = queryBuilder.getResultList();
         List<AccommodationWithPrice> accommodationsWithPrices = new ArrayList<>();
-        System.out.println("DOSAO DO POSLEDNJEG FORA ZA CENE");
         for (Object[] result : results) {
             Accommodation accommodation = (Accommodation) result[0];
             double totalPrice = 0.0;
