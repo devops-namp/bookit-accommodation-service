@@ -6,7 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uns.ac.rs.controlller.dto.AccommodationDto;
+import uns.ac.rs.controlller.dto.ReservationDto;
+import uns.ac.rs.service.Utils;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -29,4 +33,29 @@ public class Reservation {
     private List<PriceAdjustmentDate> priceAdjustmentDate;
 
     private String guestUsername;
+
+    private String state;
+
+    private int numOfGuests;
+
+    private LocalDate fromDate;
+    private LocalDate toDate;
+    private double totalPrice;
+
+    public Reservation(ReservationDto reservationDto, Accommodation accommodation) {
+        setAccommodation(accommodation);
+        setGuestUsername(reservationDto.getGuestUsername());
+        setState(String.valueOf(Reservation.ReservationState.PENDING));
+        setNumOfGuests(reservationDto.getNumOfGusts());
+//        setFromDate(Utils.convertToLocaldate(reservationDto.getFromDate()).minusDays(1));
+//        setToDate(Utils.convertToLocaldate(reservationDto.getToDate()).plusDays(1));
+        setFromDate(Utils.convertToLocaldate(reservationDto.getFromDate());
+        setToDate(Utils.convertToLocaldate(reservationDto.getToDate());
+        setTotalPrice(reservationDto.getTotalPrice());
+    }
+
+
+    public enum ReservationState {
+        PENDING, APPROVED, DECLINED
+    }
 }
