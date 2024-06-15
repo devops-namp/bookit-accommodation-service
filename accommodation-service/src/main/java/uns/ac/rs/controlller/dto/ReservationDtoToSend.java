@@ -17,6 +17,7 @@ public class ReservationDtoToSend {
     private String toDate;
     private int numOfGusts;
     private double totalPrice;
+    private String state;
 
     public ReservationDtoToSend(Reservation reservation, String fromDate, String toDate, int numOfGusts, double totalPrice, AccommodationDto accommodationDto) {
         this(
@@ -27,8 +28,20 @@ public class ReservationDtoToSend {
                 fromDate,
                 toDate,
                 numOfGusts,
-                totalPrice
+                totalPrice,
+                reservation.getState()
         );
     }
 
+    public ReservationDtoToSend(Reservation r) {
+        setId(r.getId());
+        setAccommodationDto(new AccommodationDto(r.getAccommodation()));
+        setFromDate(String.valueOf(r.getFromDate()));
+        setToDate(String.valueOf(r.getToDate()));
+        setNumOfGusts(r.getNumOfGuests());
+        setTotalPrice(r.getTotalPrice());
+        setGuestUsername(r.getGuestUsername());
+        setState(r.getState());
+
+    }
 }
