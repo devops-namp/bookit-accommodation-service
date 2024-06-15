@@ -80,7 +80,7 @@ public class ReservationController {
     @PermitAll
     public Response getByUser(@PathParam("username") String username) {
         System.out.println("USLI SMO U TRAZENJE VLASNIKOVIH REZERVACIJA");
-        List<Reservation> retVal = reservationService.getByUser(username);
+        List<ReservationDtoToSend> retVal = reservationService.getByUser(username);
         return Response.ok(retVal).build();
     }
 
