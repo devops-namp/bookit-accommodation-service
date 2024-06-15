@@ -50,6 +50,6 @@ VALUES
 
 -- INSERT INTO images (accommodation_id, image_data)
 -- VALUES
--- (1, decode('9d1d1414792cb45cdbaf2035461e7e8d2c81cce9edc7d5ee1d5a149859779c51', 'hex')),
+-- (1, decode('9d1d1414792cb45cdbaf2035461e7e8d2c81cce9edc7d5ee1d5a149859779c51'),
 -- (2, decode('f0ea024f8ca6635a3705626675fce84d9f15e0b4d24e4cfc2b1670557c8c6a54', 'hex')),
 -- (3, decode('a30fb149bc14d56db364879b8a9ca4ad134cffbc85a7e95a8557b0ca3177119b', 'hex'));

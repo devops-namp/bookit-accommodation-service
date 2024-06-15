@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import uns.ac.rs.controlller.dto.ReservationDto;
+import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ReservationService {
@@ -100,7 +102,10 @@ public class ReservationService {
         }
     }
 
-    public List<Reservation> getByUser(String username) {
-        return reservationRepository.getByUser(username);
+    @Transactional
+    public List<ReservationDtoToSend> getByUser(String username) {
+        return reservationRepository.getByUser(username).stream()
+                .map(ReservationDtoToSend::new)
+                .collect(Collectors.toList());
     }
 }
