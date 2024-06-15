@@ -49,8 +49,8 @@ public class Reservation {
         setNumOfGuests(reservationDto.getNumOfGusts());
 //        setFromDate(Utils.convertToLocaldate(reservationDto.getFromDate()).minusDays(1));
 //        setToDate(Utils.convertToLocaldate(reservationDto.getToDate()).plusDays(1));
-        setFromDate(Utils.convertToLocaldate(reservationDto.getFromDate());
-        setToDate(Utils.convertToLocaldate(reservationDto.getToDate());
+        setFromDate(Utils.convertToLocaldate(reservationDto.getFromDate()));
+        setToDate(Utils.convertToLocaldate(reservationDto.getToDate()));
         setTotalPrice(reservationDto.getTotalPrice());
     }
 
