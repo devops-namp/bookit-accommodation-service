@@ -1,12 +1,16 @@
 package uns.ac.rs.controlller;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.AllArgsConstructor;
+import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.Reservation;
+import uns.ac.rs.service.AccommodationService;
 import uns.ac.rs.service.ReservationService;
 
 import java.util.List;
@@ -19,6 +23,8 @@ public class ReservationController {
 
     @Inject
     ReservationService reservationService;
+    @Inject
+    AccommodationService accommodationService;
 
     @GET
     public List<Reservation> listAll() {
@@ -36,7 +42,8 @@ public class ReservationController {
     @POST
     public Response create(ReservationDto reservationDto) {
         Reservation created = reservationService.create(reservationDto);
-        ReservationDtoToSend reservationDtoToSend = new ReservationDtoToSend(created,reservationDto.getFromDate(), reservationDto.getToDate());
+        AccommodationDto accommodationDto = new AccommodationDto(accommodationService.getById(Long.valueOf(reservationDto.getAccommodationId())).orElseGet(null));
+        ReservationDtoToSend reservationDtoToSend = new ReservationDtoToSend(created,reservationDto.getFromDate(), reservationDto.getToDate(), reservationDto.getNumOfGusts(), reservationDto.getTotalPrice(),accommodationDto);
         return Response.status(Response.Status.CREATED).entity(reservationDtoToSend).build();
     }
 
@@ -58,4 +65,23 @@ public class ReservationController {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
+
+    @POST
+    @Path("changeStatus/{id}/{state}")
+    public Response approve(@PathParam("id") Long id, @PathParam("state") String state) {
+        System.out.println("USLI SMO U MENJANJE STATUSA");
+        reservationService.changeStatus(id, state);
+        return Response.ok().build();
+    }
+
+
+    @GET
+    @Path("getByUser/{username}")
+    @PermitAll
+    public Response getByUser(@PathParam("username") String username) {
+        System.out.println("USLI SMO U TRAZENJE VLASNIKOVIH REZERVACIJA");
+        List<Reservation> retVal = reservationService.getByUser(username);
+        return Response.ok(retVal).build();
+    }
+
 }

@@ -14,6 +14,7 @@ import uns.ac.rs.repository.ReservationRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,24 +47,24 @@ public class ReservationService {
         if (!accommodationOptional.isPresent()) {
             throw new IllegalArgumentException("Accommodation not found");
         }
-        Accommodation accommodation = accommodationOptional.get();
-        Reservation reservation = new Reservation();
-        reservation.setAccommodation(accommodation);
-        reservation.setGuestUsername(reservationDto.getGuestUsername());
-
-        List<PriceAdjustment> priceAdjustments = priceAdjustmentRepository.findByAccommodationId(accommodation.getId());
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate fromDate = LocalDate.parse(reservationDto.getFromDate(), formatter).minusDays(1);
-        LocalDate toDate = LocalDate.parse(reservationDto.getToDate(), formatter).plusDays(1);
+        Reservation reservation = new Reservation(reservationDto,accommodationOptional.orElseGet(null));
 
 
-        for (PriceAdjustment pa : priceAdjustments) {
-            PriceAdjustmentDate pad = pa.getPriceAdjustmentDate();
-            if(pad.getDate().isAfter(fromDate) && pad.getDate().isBefore(toDate))
-                pad.setReservation(reservation);
-        }
-        reservation.setPriceAdjustmentDate(priceAdjustments.stream().map(PriceAdjustment::getPriceAdjustmentDate).toList());
+
+//        Accommodation accommodation = accommodationOptional.get();
+//        List<PriceAdjustment> priceAdjustments = priceAdjustmentRepository.findByAccommodationId(accommodation.getId());
+//        List<PriceAdjustmentDate> priceAdjustmentDates = new ArrayList<>();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        LocalDate fromDate = LocalDate.parse(reservationDto.getFromDate(), formatter).minusDays(1);
+//        LocalDate toDate = LocalDate.parse(reservationDto.getToDate(), formatter).plusDays(1);
+
+
+//        for (PriceAdjustment pa : priceAdjustments) {
+//            PriceAdjustmentDate pad = pa.getPriceAdjustmentDate();
+//            if(pad.getDate().isAfter(fromDate) && pad.getDate().isBefore(toDate))
+//                priceAdjustmentDates.add(pad);
+//        }
+//        reservation.setPriceAdjustmentDate(priceAdjustments.stream().map(PriceAdjustment::getPriceAdjustmentDate).toList());
         reservationRepository.persist(reservation);
 
         return reservation;
@@ -83,5 +84,23 @@ public class ReservationService {
     @Transactional
     public boolean delete(Long id) {
         return reservationRepository.deleteById(id);
+    }
+
+    public void approve(Long id) {
+//        reservationRepository.setStatus(id, String.valueOf(Reservation.ReservationState.APPROVED));
+
+    }
+
+    public void changeStatus(Long id, String state) {
+        Reservation reservation = reservationRepository.findById(id);
+        if (reservation != null) {
+            reservation.setState(state);
+        } else {
+            System.out.println("Reservation not found for id: " + id);
+        }
+    }
+
+    public List<Reservation> getByUser(String username) {
+        return reservationRepository.getByUser(username);
     }
 }

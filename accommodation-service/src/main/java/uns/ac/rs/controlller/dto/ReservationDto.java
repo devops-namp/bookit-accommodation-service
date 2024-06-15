@@ -24,4 +24,6 @@ public class ReservationDto {
     private String hostUsername;
     private String fromDate;
     private String toDate;
+    private int numOfGusts;
+    private double totalPrice;
 }

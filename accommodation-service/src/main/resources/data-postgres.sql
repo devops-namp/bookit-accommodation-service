@@ -5,12 +5,10 @@ VALUES
 ('Beachfront Condo', 'host2', 'Malibu, CA', 'wifi,parking,pool', 1, 4, 'price_per_unit');
 
 
-INSERT INTO reservation (accommodation_id, guestusername)
+INSERT INTO reservation (accommodation_id, guestusername, state, numofguests, fromdate, todate, totalprice)
 VALUES
-(1, 'guestUser1'),
-(1, 'guestUser2');
-
-
+(1, 'guestUser1', 'CONFIRMED', 2, '2024-07-10', '2024-07-14', 600.00),
+(2, 'guestUser2', 'PENDING', 1, '2024-07-12', '2024-07-16', 400.00);
 
 INSERT INTO priceadjustmentdate (date, price,reservation_id)
 VALUES
