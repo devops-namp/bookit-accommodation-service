@@ -3,10 +3,7 @@ package uns.ac.rs.controlller.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.Reservation;
-
-import java.util.ArrayList;
 
 @Getter
 @Setter
@@ -18,15 +15,19 @@ public class ReservationDtoToSend {
     private String hostUsername;
     private String fromDate;
     private String toDate;
+    private int numOfGusts;
+    private double totalPrice;
 
-    public ReservationDtoToSend(Reservation reservation, String fromDate, String toDate) {
+    public ReservationDtoToSend(Reservation reservation, String fromDate, String toDate, int numOfGusts, double totalPrice, AccommodationDto accommodationDto) {
         this(
                 reservation.getId(),
-                new AccommodationDto(reservation.getAccommodation()),
+                accommodationDto,
                 reservation.getGuestUsername(),
-                reservation.getAccommodation().getHostUsername(),
+                accommodationDto.getHostUsername(),
                 fromDate,
-                toDate
+                toDate,
+                numOfGusts,
+                totalPrice
         );
     }
 
