@@ -82,7 +82,8 @@ class AccommodationServiceTest {
 
         when(accommodationRepository.findByIdOptional(1L)).thenReturn(Optional.of(existingAccommodation));
 
-        accommodationService.updateAccommodation(1L, updatedAccommodation, "host");
+        AccommodationDto updatedAccommodationDto = new AccommodationDto(updatedAccommodation);
+        accommodationService.updateAccommodation(1L, updatedAccommodationDto, "host");
 
         verify(accommodationRepository, times(1)).findByIdOptional(1L);
         verify(accommodationRepository, times(1)).persist(existingAccommodation);
