@@ -10,6 +10,7 @@ import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
 import uns.ac.rs.repository.AccommodationRepository;
+import uns.ac.rs.repository.ImageRepository;
 import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
 
@@ -31,6 +32,9 @@ public class AccommodationService {
     @Inject
     PriceAdjustmentDateRepository priceAdjustmentDateRepository;
 
+    @Inject
+    ImageRepository imageRepository;
+
     @Transactional
     public List<Accommodation> getAll() {
         return accommodationRepository.listAll();
@@ -49,7 +53,7 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void updateAccommodation(Long id, Accommodation updatedAccommodation, String username) {
+    public Accommodation updateAccommodation(Long id, Accommodation updatedAccommodation, String username) {
         accommodationRepository.findByIdOptional(id).ifPresent(existingAccommodation -> {
             if (!existingAccommodation.getHostUsername().equals(username)) {
                 return;
@@ -60,10 +64,17 @@ public class AccommodationService {
             existingAccommodation.setMinGuests(updatedAccommodation.getMinGuests());
             existingAccommodation.setMaxGuests(updatedAccommodation.getMaxGuests());
             existingAccommodation.setPriceType(updatedAccommodation.getPriceType());
-            existingAccommodation.setPriceAdjustments(updatedAccommodation.getPriceAdjustments());
+            for (var image : existingAccommodation.getImages()) {
+                imageRepository.delete(image);
+            }
+            for (var image : updatedAccommodation.getImages()) {
+                image.setAccommodation(existingAccommodation);
+                imageRepository.persist(image);
+            }
             existingAccommodation.setImages(updatedAccommodation.getImages());
             accommodationRepository.persist(existingAccommodation);
         });
+        return accommodationRepository.findById(id);
     }
 
     @Transactional
@@ -105,6 +116,12 @@ public class AccommodationService {
         accommodation.setPriceAdjustments(priceAdjustments);
         accommodationRepository.persist(accommodation);
         return accommodation;
+    }
+
+    @Transactional
+    public Accommodation removePrices(Long id, List<LocalDate> toRemove) {
+        // TODO: implement logic here
+        return null;
     }
 
     @Transactional
