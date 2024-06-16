@@ -1,8 +1,8 @@
 INSERT INTO public."bookit-accommodation" (name, hostusername, location, filters, minguests, maxguests, pricetype)
 VALUES
-('Mountain Cabin Retreat', 'username2', 'Aspen, CO', 'wifi,parking,fireplace,bath', 2, 6, 'price_per_person'),
-('City Center Studio',  'host2', 'New York, NY', 'wifi,parking,tv', 1, 2, 'price_per_person'),
-('Beachfront Condo', 'host2', 'Malibu, CA', 'wifi,parking,pool', 1, 4, 'price_per_unit');
+('Mountain Cabin Retreat', 'username2', 'Aspen', 'wifi,parking,fireplace,bath', 2, 6, 'price_per_person'),
+('City Center Studio',  'host2', 'New York', 'wifi,parking,tv', 1, 2, 'price_per_person'),
+('Beachfront Condo', 'host2', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_unit');
 
 
 INSERT INTO reservation (accommodation_id, guestusername, state, numofguests, fromdate, todate, totalprice)
@@ -14,9 +14,9 @@ INSERT INTO priceadjustmentdate (date, price,reservation_id)
 VALUES
 ('2024-07-10', 150,1),
 ('2024-07-11', 150,1),
-('2024-07-12', 150,2),
-('2024-07-13', 150,2),
-('2024-07-14', 150,null),
+('2024-07-12', 150,1),
+('2024-07-13', 150,1),
+('2024-07-14', 150,1),
 
 ('2024-07-10', 100,null),
 ('2024-07-11', 100,null),
@@ -47,9 +47,3 @@ VALUES
 (3, 13),
 (3, 14),
 (3, 15);
-
--- INSERT INTO images (accommodation_id, image_data)
--- VALUES
--- (1, decode('9d1d1414792cb45cdbaf2035461e7e8d2c81cce9edc7d5ee1d5a149859779c51'),
--- (2, decode('f0ea024f8ca6635a3705626675fce84d9f15e0b4d24e4cfc2b1670557c8c6a54', 'hex')),
--- (3, decode('a30fb149bc14d56db364879b8a9ca4ad134cffbc85a7e95a8557b0ca3177119b', 'hex'));
