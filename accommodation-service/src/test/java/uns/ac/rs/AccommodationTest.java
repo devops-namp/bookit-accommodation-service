@@ -171,17 +171,64 @@ class AccommodationTest {
     void testSearch() {
         given()
                 .queryParam("name", "Ocean View")
-                .queryParam("location", "Miami Beach, FL")
+                .queryParam("location", "Miami Beach")
                 .queryParam("filters", "wifi,parking,kitchen")
-                .queryParam("minGuests", 1)
-                .queryParam("maxGuests", 4)
+                .queryParam("numGuests", 2)
                 .queryParam("fromDate", "2024-06-01")
                 .queryParam("toDate", "2024-06-30")
-                .queryParam("price", 150.00)
-                .queryParam("priceType", "price per unit")
+                .queryParam("fromPrice", 150.00)
+                .queryParam("toPrice", 300.00)
                 .when().get("/accommodation/search")
                 .then()
                 .statusCode(200)
                 .body("$.size()", is(greaterThanOrEqualTo(0)));
+    }
+
+    @Test
+    void testSearchWithSpecificFilters() {
+        given()
+                .queryParam("filters", "wifi,parking,fireplace,bath")
+                .queryParam("fromDate", "2024-07-10")
+                .queryParam("toDate", "2024-07-14")
+                .queryParam("fromPrice", 150.00)
+                .queryParam("toPrice", 300.00)
+                .when().get("/accommodation/search")
+                .then()
+                .statusCode(200)
+                .body("$.size()", is(greaterThanOrEqualTo(0)));
+    }
+
+    @Test
+    void testSearchWithSpecificNumberOfGuests() {
+        given()
+                .queryParam("numGuests", 1)
+                .queryParam("fromDate", "2024-07-10")
+                .queryParam("toDate", "2024-07-14")
+                .queryParam("fromPrice", 50.00)
+                .queryParam("toPrice", 400.00)
+                .when().get("/accommodation/search")
+                .then()
+                .statusCode(200)
+                .body("$.size()", is(greaterThanOrEqualTo(0)));
+    }
+
+    @Test
+    void testSearchWithMissingDateRange() {
+        given()
+                .queryParam("fromPrice", 150.00)
+                .queryParam("toPrice", 300.00)
+                .when().get("/accommodation/search")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void testSearchWithMissingPriceRange() {
+        given()
+                .queryParam("fromDate", "2024-07-10")
+                .queryParam("toDate", "2024-07-14")
+                .when().get("/accommodation/search")
+                .then()
+                .statusCode(400);
     }
 }
