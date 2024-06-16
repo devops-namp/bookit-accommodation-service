@@ -9,6 +9,7 @@ import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.controlller.dto.ImageDto;
+import uns.ac.rs.controlller.request.RemovePriceRequest;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.request.AdjustPriceRequest;
 import uns.ac.rs.service.AccommodationService;
@@ -91,7 +92,9 @@ public class AccommodationController {
     @RolesAllowed({ "HOST" })
     public Response updateAccommodation(@PathParam("id") Long id, Accommodation accommodation) {
         String username = securityIdentity.getPrincipal().getName();
-        accommodationService.updateAccommodation(id, accommodation, username);
+        LOG.info("Updating accommodation: " + id.toString() + " for host: " + username);
+        accommodation = accommodationService.updateAccommodation(id, accommodation, username);
+        LOG.info("Updated accommodation");
         return Response.ok(new AccommodationDto(accommodation)).build();
     }
 
@@ -128,6 +131,30 @@ public class AccommodationController {
         }
         return Response.ok(new AccommodationDto(accommodation)).build();
     }
+
+    @DELETE
+    @Path("/price/{id}")
+    @RolesAllowed({ "HOST" })
+    public Response removePrices(@PathParam("id") Long id, RemovePriceRequest request) {
+        List<LocalDate> newPricesMap = new ArrayList<>();
+        System.out.println("Removing prices for accommodation: " + id);
+
+        request.getPricesPerInterval().forEach(intervalPrice -> {
+            var startDate = intervalPrice.getStartDate();
+            var endDate = intervalPrice.getEndDate();
+            startDate.datesUntil(endDate.plusDays(1)).forEach(newPricesMap::add);
+            System.out.println("Removed price for interval: " + startDate + " - " + endDate);
+        });
+
+        var accommodation = accommodationService.removePrices(id, newPricesMap);
+        if (accommodation == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(new AccommodationDto(accommodation)).build();
+    }
+
+
+
     @GET
     @Path("/search")
     @PermitAll
