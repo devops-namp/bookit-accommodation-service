@@ -2,14 +2,17 @@ package uns.ac.rs.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.TypedQuery;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
+import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustmentDate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class AccommodationRepository implements PanacheRepository<Accommodation> {
@@ -100,4 +103,30 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
         return accommodationsWithPrices;
     }
 
+
+    public List<DateInfoDto> getMonthInformation(Accommodation accommodation, Integer month, Integer year) {
+        LocalDate startOfMonth = LocalDate.of(year, month, 1);
+        LocalDate endOfMonth = startOfMonth.plusMonths(1).minusDays(1);
+
+        String queryStr = "SELECT pad " +
+                "FROM PriceAdjustmentDate pad " +
+                "LEFT JOIN pad.reservation res " +
+                "WHERE pad.date BETWEEN :startOfMonth AND :endOfMonth " +
+                "AND (pad.reservation IS NULL OR res.accommodation.id = :accommodationId)";
+
+        TypedQuery<PriceAdjustmentDate> query = getEntityManager().createQuery(queryStr, PriceAdjustmentDate.class);
+        query.setParameter("accommodationId", accommodation.getId());
+        query.setParameter("startOfMonth", startOfMonth);
+        query.setParameter("endOfMonth", endOfMonth);
+
+        List<PriceAdjustmentDate> pads = query.getResultList();
+
+        return pads.stream()
+                .map(pad -> new DateInfoDto(
+                        pad.getDate().toString(),
+                        pad.getPrice(),
+                        pad.getReservation() == null ? "Available" : "Reserved"
+                ))
+                .collect(Collectors.toList());
+    }
 }

@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
+import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.controlller.dto.ImageDto;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.request.AdjustPriceRequest;
@@ -156,6 +157,10 @@ public class AccommodationController {
     }
 
 
-
-
+    @GET
+    @Path("/dates/{id}")
+    @PermitAll
+    public List<DateInfoDto> getDatesInfo(@PathParam("id") Long id, @QueryParam("month") Integer month, @QueryParam("year") Integer year) {
+        return accommodationService.getMonthInformation(id, month, year);
+    }
 }

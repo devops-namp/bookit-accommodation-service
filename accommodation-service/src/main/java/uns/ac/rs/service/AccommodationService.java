@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
+import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
@@ -14,9 +15,12 @@ import uns.ac.rs.repository.PriceAdjustmentRepository;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 public class AccommodationService {
+
+    Logger LOG = Logger.getLogger(String.valueOf(AccommodationService.class));
 
     @Inject
     AccommodationRepository accommodationRepository;
@@ -114,5 +118,10 @@ public class AccommodationService {
         return accommodationDtos;
     }
 
-
+    @Transactional
+    public List<DateInfoDto> getMonthInformation(Long id, Integer month, Integer year) {
+        LOG.info("Getting month information for accommodation with id: " + id + " for month: " + month + " and year: " + year);
+        var accommodation = accommodationRepository.findByIdOptional(id).orElseThrow();
+        return accommodationRepository.getMonthInformation(accommodation, month, year);
+    }
 }
