@@ -1,5 +1,6 @@
 package uns.ac.rs;
 
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
@@ -7,6 +8,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import uns.ac.rs.controlller.request.AdjustPriceRequest;
 import uns.ac.rs.entity.Accommodation;
+import uns.ac.rs.resources.PostgresResource;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -19,6 +21,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 
 @QuarkusTest
+@QuarkusTestResource(PostgresResource.class)
 class AccommodationTest {
 
     @Test

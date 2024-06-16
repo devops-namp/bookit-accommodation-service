@@ -48,3 +48,5 @@ src/main/resources/publickey.pem
 src/test/resources/privatekey.pem
 src/test/resources/publickey.pem
 
+accommodation-service/logs/
+

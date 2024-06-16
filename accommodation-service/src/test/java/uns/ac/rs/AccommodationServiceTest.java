@@ -187,4 +187,156 @@ class AccommodationServiceTest {
         assertEquals(1, result.size());
         verify(accommodationRepository, times(1)).search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(),anyDouble(), anyString());
     }
+    @Test
+    void testSearchWithSpecificFilters() {
+        AccommodationWithPrice accommodation = new AccommodationWithPrice();
+        List<AccommodationWithPrice> accommodations = List.of(accommodation);
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(accommodations);
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "Aspen",  new ArrayList<>(Arrays.asList("wifi", "parking", "fireplace", "bath")), 2,
+                LocalDate.of(2024, 7, 10), LocalDate.of(2024, 7, 14), 0.0, 0.0, "price_per_person"
+        );
+
+        assertEquals(1, result.size());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("Aspen"), eq(List.of("wifi", "parking", "fireplace", "bath")),
+                eq(2), eq(LocalDate.of(2024, 7, 10)), eq(LocalDate.of(2024, 7, 14)),
+                eq(0.0), eq(0.0), eq("price_per_person")
+        );
+    }
+
+    @Test
+    void testSearchWithSpecificNumberOfGuests() {
+        AccommodationWithPrice accommodation = new AccommodationWithPrice();
+        List<AccommodationWithPrice> accommodations = List.of(accommodation);
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(accommodations);
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "Malibu", List.of("wifi", "parking", "pool"), 3,
+                LocalDate.of(2024, 7, 10), LocalDate.of(2024, 7, 14), 0.0, 0.0, "price_per_unit"
+        );
+
+        assertEquals(1, result.size());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("Malibu"), eq(List.of("wifi", "parking", "pool")),
+                eq(3), eq(LocalDate.of(2024, 7, 10)), eq(LocalDate.of(2024, 7, 14)),
+                eq(0.0), eq(0.0), eq("price_per_unit")
+        );
+    }
+
+    @Test
+    void testSearchWithDateRange() {
+        AccommodationWithPrice accommodation = new AccommodationWithPrice();
+        List<AccommodationWithPrice> accommodations = List.of(accommodation);
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(accommodations);
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "New York, NY", List.of("wifi", "parking", "tv"), 1,
+                LocalDate.of(2024, 7, 12), LocalDate.of(2024, 7, 16), 0.0, 0.0, "price_per_person"
+        );
+
+        assertEquals(1, result.size());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("New York, NY"), eq(List.of("wifi", "parking", "tv")),
+                eq(1), eq(LocalDate.of(2024, 7, 12)), eq(LocalDate.of(2024, 7, 16)),
+                eq(0.0), eq(0.0), eq("price_per_person")
+        );
+    }
+
+    @Test
+    void testSearchWithPriceRange() {
+        AccommodationWithPrice accommodation = new AccommodationWithPrice();
+        List<AccommodationWithPrice> accommodations = List.of(accommodation);
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(accommodations);
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "Malibu", List.of("wifi", "parking", "pool"), 3,
+                LocalDate.of(2024, 7, 10), LocalDate.of(2024, 7, 14), 200.0, 800.0, "price_per_unit"
+        );
+
+        assertEquals(1, result.size());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("Malibu"), eq(List.of("wifi", "parking", "pool")),
+                eq(3), eq(LocalDate.of(2024, 7, 10)), eq(LocalDate.of(2024, 7, 14)),
+                eq(200.0), eq(800.0), eq("price_per_unit")
+        );
+    }
+
+
+    @Test
+    void testSearchWithNoMatchingFilters() {
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(new ArrayList<>());
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "Malibu", List.of("gym"), 2,
+                LocalDate.of(2024, 7, 10), LocalDate.of(2024, 7, 14), 0.0, 0.0, "price_per_unit"
+        );
+
+        assertTrue(result.isEmpty());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("Malibu"), eq(List.of("gym")),
+                eq(2), eq(LocalDate.of(2024, 7, 10)), eq(LocalDate.of(2024, 7, 14)),
+                eq(0.0), eq(0.0), eq("price_per_unit")
+        );
+    }
+
+    @Test
+    void testSearchWithNoMatchingDateRange() {
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(new ArrayList<>());
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "Malibu", List.of("wifi", "parking", "pool"), 3,
+                LocalDate.of(2024, 8, 1), LocalDate.of(2024, 8, 15), 0.0, 0.0, "price_per_unit"
+        );
+
+        assertTrue(result.isEmpty());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("Malibu"), eq(List.of("wifi", "parking", "pool")),
+                eq(3), eq(LocalDate.of(2024, 8, 1)), eq(LocalDate.of(2024, 8, 15)),
+                eq(0.0), eq(0.0), eq("price_per_unit")
+        );
+    }
+
+    @Test
+    void testSearchWithNoMatchingPriceRange() {
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(new ArrayList<>());
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "Malibu", List.of("wifi", "parking", "pool"), 3,
+                LocalDate.of(2024, 7, 10), LocalDate.of(2024, 7, 14), 1000.0, 2000.0, "price_per_unit"
+        );
+
+        assertTrue(result.isEmpty());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("Malibu"), eq(List.of("wifi", "parking", "pool")),
+                eq(3), eq(LocalDate.of(2024, 7, 10)), eq(LocalDate.of(2024, 7, 14)),
+                eq(1000.0), eq(2000.0), eq("price_per_unit")
+        );
+    }
+
+    @Test
+    void testSearchWithExceedingNumberOfGuests() {
+        when(accommodationRepository.search(anyString(), anyString(), anyList(), anyInt(), any(LocalDate.class), any(LocalDate.class), anyDouble(), anyDouble(), anyString()))
+                .thenReturn(new ArrayList<>());
+
+        List<AccommodationWithPrice> result = accommodationService.searchAccommodations(
+                "", "Malibu", List.of("wifi", "parking", "pool"), 10,
+                LocalDate.of(2024, 7, 10), LocalDate.of(2024, 7, 14), 0.0, 0.0, "price_per_unit"
+        );
+
+        assertTrue(result.isEmpty());
+        verify(accommodationRepository, times(1)).search(
+                eq(""), eq("Malibu"), eq(List.of("wifi", "parking", "pool")),
+                eq(10), eq(LocalDate.of(2024, 7, 10)), eq(LocalDate.of(2024, 7, 14)),
+                eq(0.0), eq(0.0), eq("price_per_unit")
+        );
+    }
 }

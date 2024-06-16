@@ -29,7 +29,7 @@ public class Reservation {
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
 
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reservation")
     private List<PriceAdjustmentDate> priceAdjustmentDate;
 
     private String guestUsername;
