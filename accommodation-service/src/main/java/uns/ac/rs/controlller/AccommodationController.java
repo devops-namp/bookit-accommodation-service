@@ -169,6 +169,17 @@ public class AccommodationController {
                                                              @QueryParam("priceType") String priceType) {
         LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
         LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
+
+        // dodato zbog testova
+        if (fromDateStr == null || toDateStr == null) {
+            throw new WebApplicationException("Both fromDate and toDate must be provided", 400);
+        }
+
+        if (fromPrice == null || toPrice == null) {
+            throw new WebApplicationException("Both fromPrice and toPrice must be provided", 400);
+        }
+
+
         System.out.println("Parameters:");
         System.out.println("name: " + name);
         System.out.println("location: " + location);
@@ -178,9 +189,19 @@ public class AccommodationController {
         System.out.println("toPrice: " + toPrice);
         System.out.println("fromPrice: " + fromPrice);
         System.out.println("priceType: " + priceType);
-        System.out.println("filtersssss: " + Arrays.toString(filters.get(0).split(",")));
-        List<String> correctFlters = Arrays.asList(filters.get(0).split(","));
-        return accommodationService.searchAccommodations(name, location, correctFlters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType);
+
+        List<String> correctFilters = new ArrayList<>();
+        if (filters != null && !filters.isEmpty()) {
+            String firstFilter = filters.get(0);
+            if (firstFilter.contains(",")) {
+                correctFilters = Arrays.asList(firstFilter.split(","));
+            } else {
+                correctFilters.add(firstFilter);
+            }
+        }
+
+        System.out.println("filtersssss: " + correctFilters);
+        return accommodationService.searchAccommodations(name, location, correctFilters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType);
     }
 
 
