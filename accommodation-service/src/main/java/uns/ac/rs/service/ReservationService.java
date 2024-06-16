@@ -6,16 +6,11 @@ import jakarta.transaction.Transactional;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.Accommodation;
-import uns.ac.rs.entity.PriceAdjustment;
-import uns.ac.rs.entity.PriceAdjustmentDate;
 import uns.ac.rs.entity.Reservation;
 import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,24 +83,27 @@ public class ReservationService {
         return reservationRepository.deleteById(id);
     }
 
-    public void approve(Long id) {
-//        reservationRepository.setStatus(id, String.valueOf(Reservation.ReservationState.APPROVED));
+    public void approve(Long reservationId) {
+        // TODO
 
     }
 
-    public void changeStatus(Long id, String state) {
-        Reservation reservation = reservationRepository.findById(id);
-        if (reservation != null) {
-            reservation.setState(state);
-        } else {
-            System.out.println("Reservation not found for id: " + id);
-        }
-    }
+
 
     @Transactional
-    public List<ReservationDtoToSend> getByUser(String username) {
-        return reservationRepository.getByUser(username).stream()
+    public List<ReservationDtoToSend> getByHost(String username) {
+        return reservationRepository.getByHost(username).stream()
                 .map(ReservationDtoToSend::new)
                 .collect(Collectors.toList());
     }
+
+    public List<ReservationDtoToSend> getByGuest(String username) {
+        return reservationRepository.getByGuest(username).stream()
+                .map(ReservationDtoToSend::new)
+                .collect(Collectors.toList());
+    }
+    public void reject(Long reservationId) {
+        reservationRepository.reject(reservationId);
+    }
+
 }
