@@ -29,6 +29,7 @@ public class Accommodation {
     private int maxGuests;
     private String priceType;
     private String hostUsername;
+    private Boolean autoAcceptReservations;
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PriceAdjustment> priceAdjustments;
