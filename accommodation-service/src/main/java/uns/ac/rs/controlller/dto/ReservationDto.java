@@ -26,4 +26,15 @@ public class ReservationDto {
     private String toDate;
     private int numOfGusts;
     private double totalPrice;
+
+    public ReservationDto(Reservation reservation)
+    {
+        this.accommodationId=String.valueOf(reservation.getAccommodation().getId());
+        this.guestUsername = reservation.getGuestUsername();
+        this.hostUsername = reservation.getAccommodation().getHostUsername();
+        this.fromDate = String.valueOf(reservation.getFromDate());
+        this.toDate = String.valueOf(reservation.getToDate());
+        this.numOfGusts = reservation.getNumOfGuests();
+        this.totalPrice = reservation.getTotalPrice();
+    }
 }
