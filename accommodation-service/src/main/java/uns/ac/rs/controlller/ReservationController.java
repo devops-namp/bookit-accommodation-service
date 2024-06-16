@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import lombok.AllArgsConstructor;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
@@ -65,23 +64,40 @@ public class ReservationController {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
+    @GET
+    @Path("getByHost/{username}")
+    @PermitAll
+    public Response getByHost(@PathParam("username") String username) {
+        System.out.println("USLI SMO U TRAZENJE VLASNIKOVIH REZERVACIJA");
+        List<ReservationDtoToSend> retVal = reservationService.getByHost(username);
+        return Response.ok(retVal).build();
+    }
+
+    @GET
+    @Path("getByGuest/{username}")
+    @PermitAll
+    public Response getByGuest(@PathParam("username") String username) {
+        System.out.println("USLI SMO U TRAZENJE GOSTOVIH REZERVACIJA");
+        List<ReservationDtoToSend> retVal = reservationService.getByGuest(username);
+        return Response.ok(retVal).build();
+    }
 
     @POST
-    @Path("changeStatus/{id}/{state}")
-    public Response approve(@PathParam("id") Long id, @PathParam("state") String state) {
-        System.out.println("USLI SMO U MENJANJE STATUSA");
-        reservationService.changeStatus(id, state);
+    @Path("/approve/{reservationId}")
+    @PermitAll
+    public Response approveReservation(@PathParam("id") Long reservationId) {
+        System.out.println("USLI SMO U ODOBRAVANJE REZERVACIJE");
+        reservationService.approve(reservationId);
         return Response.ok().build();
     }
 
-
-    @GET
-    @Path("getByUser/{username}")
+    @POST
+    @Path("/reject/{reservationId}")
     @PermitAll
-    public Response getByUser(@PathParam("username") String username) {
-        System.out.println("USLI SMO U TRAZENJE VLASNIKOVIH REZERVACIJA");
-        List<ReservationDtoToSend> retVal = reservationService.getByUser(username);
-        return Response.ok(retVal).build();
+    public Response rejectReservation(@PathParam("id") Long reservationId) {
+        System.out.println("USLI SMO U ODBIJANJE REZERVACIJE");
+        reservationService.reject(reservationId);
+        return Response.ok().build();
     }
 
 }
