@@ -24,7 +24,7 @@ public class Reservation {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
