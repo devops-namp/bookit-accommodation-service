@@ -100,6 +100,4 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
         return accommodationsWithPrices;
     }
 
-
-
 }

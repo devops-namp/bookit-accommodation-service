@@ -25,6 +25,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import io.vertx.core.json.JsonObject;
+import uns.ac.rs.service.ReservationService;
 
 @Path("/accommodation")
 @Produces(MediaType.APPLICATION_JSON)
@@ -33,6 +34,9 @@ public class AccommodationController {
 
     @Inject
     AccommodationService accommodationService;
+
+    @Inject
+    ReservationService reservationService;
 
     @Inject
     SecurityIdentity securityIdentity;
@@ -150,4 +154,8 @@ public class AccommodationController {
         List<String> correctFlters = Arrays.asList(filters.get(0).split(","));
         return accommodationService.searchAccommodations(name, location, correctFlters, numGuests, fromDate, toDate, fromPrice,toPrice, priceType);
     }
+
+
+
+
 }
