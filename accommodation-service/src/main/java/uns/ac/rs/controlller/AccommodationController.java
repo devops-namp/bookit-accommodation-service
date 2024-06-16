@@ -90,12 +90,12 @@ public class AccommodationController {
     @PUT
     @Path("/{id}")
     @RolesAllowed({ "HOST" })
-    public Response updateAccommodation(@PathParam("id") Long id, Accommodation accommodation) {
+    public Response updateAccommodation(@PathParam("id") Long id, AccommodationDto accommodation) {
         String username = securityIdentity.getPrincipal().getName();
         LOG.info("Updating accommodation: " + id.toString() + " for host: " + username);
-        accommodation = accommodationService.updateAccommodation(id, accommodation, username);
+        var accommodationResult = accommodationService.updateAccommodation(id, accommodation, username);
         LOG.info("Updated accommodation");
-        return Response.ok(new AccommodationDto(accommodation)).build();
+        return Response.ok(new AccommodationDto(accommodationResult)).build();
     }
 
     @DELETE

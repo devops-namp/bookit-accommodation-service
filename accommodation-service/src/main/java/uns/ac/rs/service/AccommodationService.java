@@ -7,6 +7,7 @@ import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.entity.Accommodation;
+import uns.ac.rs.entity.Image;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
 import uns.ac.rs.repository.AccommodationRepository;
@@ -17,6 +18,7 @@ import uns.ac.rs.repository.PriceAdjustmentRepository;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class AccommodationService {
@@ -53,29 +55,45 @@ public class AccommodationService {
     }
 
     @Transactional
-    public Accommodation updateAccommodation(Long id, Accommodation updatedAccommodation, String username) {
-        accommodationRepository.findByIdOptional(id).ifPresent(existingAccommodation -> {
-            if (!existingAccommodation.getHostUsername().equals(username)) {
-                return;
-            }
-            existingAccommodation.setName(updatedAccommodation.getName());
-            existingAccommodation.setLocation(updatedAccommodation.getLocation());
-            existingAccommodation.setFilters(updatedAccommodation.getFilters());
-            existingAccommodation.setMinGuests(updatedAccommodation.getMinGuests());
-            existingAccommodation.setMaxGuests(updatedAccommodation.getMaxGuests());
-            existingAccommodation.setPriceType(updatedAccommodation.getPriceType());
-            for (var image : existingAccommodation.getImages()) {
-                imageRepository.delete(image);
-            }
-            for (var image : updatedAccommodation.getImages()) {
-                image.setAccommodation(existingAccommodation);
-                imageRepository.persist(image);
-            }
-            existingAccommodation.setImages(updatedAccommodation.getImages());
-            accommodationRepository.persist(existingAccommodation);
-        });
+    public Accommodation updateAccommodation(Long id, AccommodationDto updatedAccommodation, String username) {
+        Accommodation existingAccommodation = accommodationRepository.findByIdOptional(id).orElse(null);
+        if (existingAccommodation == null || !existingAccommodation.getHostUsername().equals(username)) {
+            return null;
+        }
+        updateAccommodationDetails(existingAccommodation, updatedAccommodation);
+        replaceAccommodationImages(existingAccommodation, updatedAccommodation);
+        accommodationRepository.persist(existingAccommodation);
         return accommodationRepository.findById(id);
     }
+
+    private void updateAccommodationDetails(Accommodation accommodation, AccommodationDto dto) {
+        accommodation.setName(dto.getName());
+        accommodation.setLocation(dto.getLocation());
+        accommodation.setFilters(dto.getFilters());
+        accommodation.setMinGuests(dto.getMinGuests());
+        accommodation.setMaxGuests(dto.getMaxGuests());
+        accommodation.setPriceType(dto.getPriceType());
+    }
+
+    private void replaceAccommodationImages(Accommodation accommodation, AccommodationDto dto) {
+        if (accommodation.getImages() != null) {
+            accommodation.getImages().forEach(imageRepository::delete);
+        }
+
+        List<Image> images = Optional.ofNullable(dto.getImages())
+                .orElseGet(ArrayList::new)
+                .stream()
+                .map(imageDto -> {
+                    Image image = new Image();
+                    image.setImageData(imageDto.getBase64Image());
+                    image.setAccommodation(accommodation);
+                    imageRepository.persist(image);
+                    return image;
+                })
+                .collect(Collectors.toList());
+        accommodation.setImages(images);
+    }
+
 
     @Transactional
     public void deleteAccommodation(Long id) {
