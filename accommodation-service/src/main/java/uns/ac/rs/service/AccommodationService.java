@@ -10,10 +10,7 @@ import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.Image;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
-import uns.ac.rs.repository.AccommodationRepository;
-import uns.ac.rs.repository.ImageRepository;
-import uns.ac.rs.repository.PriceAdjustmentDateRepository;
-import uns.ac.rs.repository.PriceAdjustmentRepository;
+import uns.ac.rs.repository.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -36,6 +33,9 @@ public class AccommodationService {
 
     @Inject
     ImageRepository imageRepository;
+
+    @Inject
+    ReservationRepository reservationRepository;
 
     @Transactional
     public List<Accommodation> getAll() {
@@ -107,27 +107,50 @@ public class AccommodationService {
             return null;
         }
         var accommodation = accommodationOptional.get();
-
-        for (var priceAdjustment : accommodation.getPriceAdjustments()) {
-            priceAdjustmentRepository.delete(priceAdjustment);
-        }
+        var priceAdjustments = accommodation.getPriceAdjustments();
+        var existingPrices = new HashMap<LocalDate, PriceAdjustment>();
+        priceAdjustments.forEach(pa -> existingPrices.put(pa.getPriceAdjustmentDate().getDate(), pa));
         accommodation.getPriceAdjustments().clear();
 
-        List<PriceAdjustment> priceAdjustments = new ArrayList<>();
-
         newPrices.forEach((date, price) -> {
-            var priceAdjustment = new PriceAdjustment();
-            priceAdjustment.setAccommodation(accommodation);
-            priceAdjustmentRepository.persist(priceAdjustment);
-
-            var priceAdjustmentDate = new PriceAdjustmentDate(date, price);
-            priceAdjustmentDate.setPriceAdjustment(priceAdjustment);
-            priceAdjustmentDateRepository.persist(priceAdjustmentDate);
-
-            priceAdjustment.setPriceAdjustmentDate(priceAdjustmentDate);
-            priceAdjustmentRepository.persist(priceAdjustment);
+            if (reservationRepository.exists(date)) {
+                // TODO: throw error
+                return;
+            }
+            PriceAdjustment priceAdjustment;
+            if (existingPrices.containsKey(date)) {
+                priceAdjustment = existingPrices.get(date);
+                var priceAdjustmentDate = priceAdjustment.getPriceAdjustmentDate();
+                priceAdjustmentDate.setPrice(price);
+                priceAdjustmentDateRepository.persist(priceAdjustmentDate);
+                priceAdjustmentRepository.persist(priceAdjustment);
+            } else {
+                priceAdjustment = new PriceAdjustment();
+                priceAdjustment.setAccommodation(accommodation);
+                var priceAdjustmentDate = new PriceAdjustmentDate(date, price);
+                priceAdjustmentDateRepository.persist(priceAdjustmentDate);
+                priceAdjustment.setPriceAdjustmentDate(priceAdjustmentDate);
+                priceAdjustmentRepository.persist(priceAdjustment);
+                existingPrices.put(date, priceAdjustment);
+            }
             priceAdjustments.add(priceAdjustment);
         });
+
+
+//
+//        existingPrices.forEach((date, price) -> {
+//            var priceAdjustment = new PriceAdjustment();
+//            priceAdjustment.setAccommodation(accommodation);
+//            priceAdjustmentRepository.persist(priceAdjustment);
+//
+//            var priceAdjustmentDate = new PriceAdjustmentDate(date, price);
+//            priceAdjustmentDate.setPriceAdjustment(priceAdjustment);
+//            priceAdjustmentDateRepository.persist(priceAdjustmentDate);
+//
+//            priceAdjustment.setPriceAdjustmentDate(priceAdjustmentDate);
+//            priceAdjustmentRepository.persist(priceAdjustment);
+//            priceAdjustments.add(priceAdjustment);
+//        });
 
         priceAdjustments.sort(Comparator.comparing(obj -> obj.getPriceAdjustmentDate().getDate()));
 
@@ -138,7 +161,27 @@ public class AccommodationService {
 
     @Transactional
     public Accommodation removePrices(Long id, List<LocalDate> toRemove) {
-        // TODO: implement logic here
+        var accommodationOptional = accommodationRepository.findByIdOptional(id);
+        if (accommodationOptional.isEmpty()) {
+            return null;
+        }
+        var accommodation = accommodationOptional.get();
+        var existing = accommodation.getPriceAdjustments();
+        var existingDates = existing.stream().map(x -> x.getPriceAdjustmentDate().getDate()).toList();
+        List<PriceAdjustment> filtered = existing.stream().filter(x -> existingDates.contains(x.getPriceAdjustmentDate().getDate())).toList();
+
+        accommodation.getPriceAdjustments().clear();
+        existing.forEach(pa -> {
+            if (reservationRepository.exists(pa.getPriceAdjustmentDate().getDate())) {
+                // TODO: throw error
+                return;
+            }
+            var priceAdjustmentDate = pa.getPriceAdjustmentDate();
+            priceAdjustmentDateRepository.delete(priceAdjustmentDate);
+            priceAdjustmentRepository.delete(pa);
+        });
+        accommodation.setPriceAdjustments(filtered);
+        accommodationRepository.persist(accommodation);
         return null;
     }
 

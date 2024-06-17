@@ -3,8 +3,10 @@ package uns.ac.rs.repository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.Reservation;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @ApplicationScoped
@@ -18,6 +20,9 @@ public class ReservationRepository implements PanacheRepository<Reservation> {
         return list("SELECT r FROM Reservation r WHERE r.guestUsername = ?1", username);
     }
 
+    public boolean exists(LocalDate date) {
+        return false;
+    }
 
     @Transactional
     public void reject(Long reservationId) {
