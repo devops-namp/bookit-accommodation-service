@@ -108,7 +108,7 @@ public class AccommodationController {
 
     @PUT
     @Path("/price/{id}")
-    @RolesAllowed({ "HOST" })
+    // @RolesAllowed({ "HOST" })
     public Response adjustPrices(@PathParam("id") Long id, AdjustPriceRequest request) {
         Map<LocalDate, Double> newPricesMap = new HashMap<>();
         System.out.println("Adding prices for accommodation: " + id);
