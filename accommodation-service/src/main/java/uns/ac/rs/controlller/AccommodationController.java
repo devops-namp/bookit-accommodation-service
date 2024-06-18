@@ -13,6 +13,7 @@ import uns.ac.rs.controlller.dto.ImageDto;
 import uns.ac.rs.controlller.request.RemovePriceRequest;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.request.AdjustPriceRequest;
+import uns.ac.rs.entity.events.AutoApproveEvent;
 import uns.ac.rs.service.AccommodationService;
 import jakarta.ws.rs.core.Response;
 
@@ -65,6 +66,23 @@ public class AccommodationController {
         System.out.println("Primljena knjiga " + book.title + " by " + book.author);
     }
 
+
+    @Incoming("autoapprove-user-to-acc-queue")
+    public void setAutoapprove(JsonObject json) {
+        System.out.println("PRIMILA SAM AUTOAPPROVE");
+        AutoApproveEvent event = json.mapTo(AutoApproveEvent.class);
+        if (event.getType().equals(AutoApproveEvent.AutoApproveEventType.GET_BY_USER)) {
+            accommodationService.setAutoApprove(event);
+            System.out.println("Sve savrseno");
+        } else if (event.getType().equals(AutoApproveEvent.AutoApproveEventType.CHANGE)) {
+            // treba u svim userovim akomodacijama postaviti na false
+            System.out.println("TREBA DA PROMENIM NA " + event.isAutoapprove());
+            accommodationService.changeAutoapproveInAccommodations(event);
+            System.out.println("Pogasio sam sve");
+        }
+
+    }
+
     @GET
     @Path("/{id}")
     @PermitAll
@@ -85,6 +103,7 @@ public class AccommodationController {
         accommodation = accommodationService.addAccommodation(accommodation);
         LOG.info("Added accommodation with ID: " + accommodation.getId());
         accommodationDto.setId(accommodation.getId());
+        accommodationService.getAutoApprove(accommodation.getId(), username);
         return Response.status(Response.Status.CREATED).entity(accommodationDto).build();
     }
 

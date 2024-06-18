@@ -3,11 +3,14 @@ package uns.ac.rs.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
-import uns.ac.rs.entity.Accommodation;
-import uns.ac.rs.entity.Reservation;
+import uns.ac.rs.entity.*;
+import uns.ac.rs.entity.events.NotificationEvent;
+import uns.ac.rs.exception.ReservationNotFoundException;
 import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
@@ -33,6 +36,10 @@ public class ReservationService {
     @Inject
     AccommodationService accommodationService;
 
+    @Inject
+    @Channel("notification-queue")
+    Emitter<NotificationEvent> eventEmitter;
+
     public List<ReservationDtoToSend> listAll() {
         List<ReservationDtoToSend> reservationDtoToSends = new ArrayList<>();
         for(Reservation reservation : reservationRepository.listAll()){
@@ -57,31 +64,15 @@ public class ReservationService {
     @Transactional
     public Reservation create(ReservationDto reservationDto) {
         Optional<Accommodation> accommodationOptional = accommodationService.getById(Long.parseLong(reservationDto.getAccommodationId()));
-        if (!accommodationOptional.isPresent()) {
+        if (accommodationOptional.isEmpty()) {
             throw new IllegalArgumentException("Accommodation not found");
         }
         Reservation reservation = new Reservation(reservationDto,accommodationOptional.orElseGet(null));
-
-
-
-//        Accommodation accommodation = accommodationOptional.get();
-//        List<PriceAdjustment> priceAdjustments = priceAdjustmentRepository.findByAccommodationId(accommodation.getId());
-//        List<PriceAdjustmentDate> priceAdjustmentDates = new ArrayList<>();
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//        LocalDate fromDate = LocalDate.parse(reservationDto.getFromDate(), formatter).minusDays(1);
-//        LocalDate toDate = LocalDate.parse(reservationDto.getToDate(), formatter).plusDays(1);
-
-
-//        for (PriceAdjustment pa : priceAdjustments) {
-//            PriceAdjustmentDate pad = pa.getPriceAdjustmentDate();
-//            if(pad.getDate().isAfter(fromDate) && pad.getDate().isBefore(toDate))
-//                priceAdjustmentDates.add(pad);
-//        }
-//        reservation.setPriceAdjustmentDate(priceAdjustments.stream().map(PriceAdjustment::getPriceAdjustmentDate).toList());
         reservationRepository.persist(reservation);
 
         return reservation;
     }
+
     @Transactional
     public Optional<Reservation> update(Long id, Reservation reservation) {
         Optional<Reservation> existingReservation = reservationRepository.findByIdOptional(id);
@@ -99,11 +90,46 @@ public class ReservationService {
         return reservationRepository.deleteById(id);
     }
 
+    @Transactional
     public void approve(Long reservationId) {
-        // TODO
-
+        // promeni se status
+        changeStatus(reservationId, Reservation.ReservationState.APPROVED);
+        // dodaju se priceAdjustmenti
+        addPriceAdjuctmentDates(reservationId);
+        // odbijamo ostale koji su u tom periodu
+        rejectOthers(reservationId);
+        // saljemo notifikaciju gostu
     }
 
+
+    private void rejectOthers(Long reservationId) {
+        Reservation r = reservationRepository.findById(reservationId);
+        reservationRepository.rejectOthers(r);
+    }
+
+    private void addPriceAdjuctmentDates(Long reservationId) {
+        Reservation reservationOptional = reservationRepository.findById(reservationId);
+        Accommodation accommodation = reservationOptional.getAccommodation();
+
+        List<PriceAdjustment> priceAdjustments = priceAdjustmentRepository.findByAccommodationId(accommodation.getId());
+        List<PriceAdjustmentDate> priceAdjustmentDates = new ArrayList<>();
+        LocalDate fromDate = reservationOptional.getFromDate().minusDays(1);
+        LocalDate toDate = reservationOptional.getToDate().plusDays(1);
+
+        for (PriceAdjustment pa : priceAdjustments) {
+            PriceAdjustmentDate pad = pa.getPriceAdjustmentDate();
+            if(pad.getDate().isAfter(fromDate) && pad.getDate().isBefore(toDate)) {
+                priceAdjustmentDates.add(pad);
+            }
+        }
+        reservationOptional.setPriceAdjustmentDate(priceAdjustmentDates);
+        reservationRepository.persist(reservationOptional);
+
+        for(PriceAdjustmentDate priceAdjustmentDate : priceAdjustmentDates){
+            priceAdjustmentDate.setReservation(reservationOptional);
+            priceAdjustmentDateRepository.persist(priceAdjustmentDate);
+        }
+    }
 
 
     @Transactional
@@ -113,13 +139,24 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional
     public List<ReservationDtoToSend> getByGuest(String username) {
         return reservationRepository.getByGuest(username).stream()
                 .map(ReservationDtoToSend::new)
                 .collect(Collectors.toList());
     }
-    public void reject(Long reservationId) {
-        reservationRepository.reject(reservationId);
+
+
+    @Transactional
+    public Reservation changeStatus(Long reservationId, Reservation.ReservationState newState) {
+        Optional<Reservation> optionalReservation = reservationRepository.findByIdOptional(reservationId);
+        Reservation reservation = optionalReservation.orElseThrow(() ->
+                new ReservationNotFoundException("Reservation not found with id " + reservationId));
+        reservation.setState(newState);
+        reservationRepository.persist(reservation);
+        sendAcceptedOrDeclinedNotification(reservation);
+        return reservation;
     }
 
     public boolean hasFutureReservations(String username, String role) {
@@ -138,4 +175,40 @@ public class ReservationService {
         return false;
     }
 
+    private void sendAcceptedOrDeclinedNotification(Reservation r) {
+        String text;
+        if (r.getState().equals(Reservation.ReservationState.APPROVED)) {
+            text = "Your reservation has been approved";
+        } else {
+            text = "Your reservation has been rejected";
+        }
+        NotificationEvent e = new NotificationEvent(r.getGuestUsername(), text);
+        eventEmitter.send(e);
+        System.out.println("Definitivno smo poslali poruku");
+    }
+
+    public void rejectByGuest(Long reservationId) {
+        // TODO povecaj brojac
+        Reservation r = changeStatus(reservationId, Reservation.ReservationState.DECLINED);
+        System.out.println("IDEMO U POVECAVANJE BROJACA!!");
+        NotificationEvent e = new NotificationEvent(r.getGuestUsername(), r.getGuestUsername() + " canceled the reservation.");
+        eventEmitter.send(e);
+        deletePriceAdjustments(r);
+    }
+
+    private void deletePriceAdjustments(Reservation r) {
+        // u ovoj metodi treba da pobrisem sve price adjustment koji imaju veze sa ovom rezervacijom
+        priceAdjustmentDateRepository.clearReservationId(r.getId());
+        System.out.println("TREBALO BI DA SAM OBRISALA ");
+
+    }
+
+    public void hadleAutoapprove(Accommodation accommodation, Reservation created) {
+        if (accommodation.isAutoApprove()) {
+            approve(created.getId());
+        } else {
+            eventEmitter.send(new NotificationEvent("You have new reservation request", accommodation.getHostUsername()));
+        }
+
+    }
 }

@@ -34,7 +34,8 @@ public class Reservation {
 
     private String guestUsername;
 
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private ReservationState state;
 
     private int numOfGuests;
 
@@ -46,7 +47,7 @@ public class Reservation {
     public Reservation(ReservationDto reservationDto, Accommodation accommodation) {
         setAccommodation(accommodation);
         setGuestUsername(reservationDto.getGuestUsername());
-        setState(String.valueOf(Reservation.ReservationState.PENDING));
+        setState(Reservation.ReservationState.PENDING);
         setNumOfGuests(reservationDto.getNumOfGusts());
 //        setFromDate(Utils.convertToLocaldate(reservationDto.getFromDate()).minusDays(1));
 //        setToDate(Utils.convertToLocaldate(reservationDto.getToDate()).plusDays(1));

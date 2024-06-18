@@ -10,6 +10,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
+import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.dto.ReservationsCheckDto;
 import uns.ac.rs.controlller.request.CheckReservationsRequest;
 import uns.ac.rs.entity.Reservation;
@@ -45,8 +46,9 @@ public class ReservationController {
     @POST
     public Response create(ReservationDto reservationDto) {
         Reservation created = reservationService.create(reservationDto);
-        AccommodationDto accommodationDto = new AccommodationDto(accommodationService.getById(Long.valueOf(reservationDto.getAccommodationId())).orElseGet(null));
-        ReservationDtoToSend reservationDtoToSend = new ReservationDtoToSend(created,reservationDto.getFromDate(), reservationDto.getToDate(), reservationDto.getNumOfGusts(), reservationDto.getTotalPrice(),accommodationDto);
+        Accommodation accommodation = accommodationService.getById(Long.valueOf(reservationDto.getAccommodationId())).orElseGet(null);
+        ReservationDtoToSend reservationDtoToSend = new ReservationDtoToSend(created,reservationDto.getFromDate(), reservationDto.getToDate(), reservationDto.getNumOfGusts(), reservationDto.getTotalPrice(), new AccommodationDto(accommodation));
+        reservationService.hadleAutoapprove(accommodation, created);
         return Response.status(Response.Status.CREATED).entity(reservationDtoToSend).build();
     }
 
@@ -72,7 +74,6 @@ public class ReservationController {
     @Path("getByHost/{username}")
     @PermitAll
     public Response getByHost(@PathParam("username") String username) {
-        System.out.println("USLI SMO U TRAZENJE VLASNIKOVIH REZERVACIJA");
         List<ReservationDtoToSend> retVal = reservationService.getByHost(username);
         return Response.ok(retVal).build();
     }
@@ -89,18 +90,25 @@ public class ReservationController {
     @POST
     @Path("/approve/{reservationId}")
     @PermitAll
-    public Response approveReservation(@PathParam("id") Long reservationId) {
-        System.out.println("USLI SMO U ODOBRAVANJE REZERVACIJE");
+    public Response approveReservation(@PathParam("reservationId") Long reservationId) {
         reservationService.approve(reservationId);
         return Response.ok().build();
     }
 
     @POST
-    @Path("/reject/{reservationId}")
+    @Path("/rejectHost/{reservationId}")
     @PermitAll
-    public Response rejectReservation(@PathParam("id") Long reservationId) {
-        System.out.println("USLI SMO U ODBIJANJE REZERVACIJE");
-        reservationService.reject(reservationId);
+    public Response rejectReservationHost(@PathParam("reservationId") Long reservationId) {
+        System.out.println("USLI SMO U ODBIJANJE REZERVACIJE HOST" + reservationId);
+        reservationService.changeStatus(reservationId, Reservation.ReservationState.DECLINED);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/rejectGuest/{reservationId}")
+    @PermitAll
+    public Response rejectReservationGuest(@PathParam("reservationId") Long reservationId) {
+        reservationService.rejectByGuest(reservationId);
         return Response.ok().build();
     }
 

@@ -3,18 +3,22 @@ package uns.ac.rs.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import uns.ac.rs.controlller.dto.AccommodationDto;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.entity.*;
 import uns.ac.rs.exceptions.AccommodationNotFoundException;
 import uns.ac.rs.exceptions.ReservationExistsOnDateException;
 import uns.ac.rs.repository.*;
+import uns.ac.rs.exception.AccommodationNotFoundException;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static io.quarkus.hibernate.orm.panache.PanacheEntityBase.persist;
 
 @ApplicationScoped
 public class AccommodationService {
@@ -35,6 +39,13 @@ public class AccommodationService {
 
     @Inject
     ReservationRepository reservationRepository;
+
+    @Inject
+    ReservationService reservationService;
+
+    @Inject
+    @Channel("autoapprove-acc-to-user-queue")
+    Emitter<AutoApproveEvent> autoApproveEmmiter;
 
     @Transactional
     public List<Accommodation> getAll() {
@@ -197,5 +208,39 @@ public class AccommodationService {
         LOG.info("Getting month information for accommodation with id: " + id + " for month: " + month + " and year: " + year);
         var accommodation = accommodationRepository.findByIdOptional(id).orElseThrow();
         return accommodationRepository.getMonthInformation(accommodation, month, year);
+    }
+
+    public void getAutoApprove(Long accommodationId, String username) {
+        AutoApproveEvent event = new AutoApproveEvent(username, accommodationId, AutoApproveEvent.AutoApproveEventType.GET_BY_USER);
+        autoApproveEmmiter.send(event);
+    }
+
+    @Transactional
+    public void setAutoApprove(AutoApproveEvent event) {
+        Accommodation accommodation = accommodationRepository.findById(event.getAccommodationId());
+        if (accommodation != null) {
+            accommodation.setAutoApprove(event.isAutoapprove());
+            persist(accommodation);
+        } else {
+            throw new AccommodationNotFoundException("Accommodation with id " + event.getAccommodationId() + " not found");
+        }
+    }
+
+    @Transactional
+    public void changeAutoapproveInAccommodations(AutoApproveEvent event) {
+        accommodationRepository.changeAutoapproveInAccommodations(event);
+        if (event.isAutoapprove()) {
+            approveExistingReservations(event.getUsername());
+
+        }
+    }
+
+    private void approveExistingReservations(String username) {
+        Reservation r = reservationRepository.findFirstPending(username);
+        while (r != null) {
+            reservationService.approve(r.getId());
+            reservationService.eventEmitter.send(new NotificationEvent("Your reservation has been approved", r.getGuestUsername()));
+            r = reservationRepository.findFirstPending(username);
+        }
     }
 }
