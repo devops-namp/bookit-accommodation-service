@@ -60,7 +60,7 @@ class AccommodationTest {
     }
 
     @Test
-    @TestSecurity(user = "host", roles = "HOST")
+    @TestSecurity(user = "username2", roles = "HOST")
     void testUpdateAccommodation() {
         Accommodation updatedAccommodation = new Accommodation();
         updatedAccommodation.setName("Updated Accommodation");
@@ -181,8 +181,8 @@ class AccommodationTest {
             LocalDate.of(2024, Month.APRIL, 18)
         );
         var interval3 = new RemovePriceRequest.IntervalPrice(
-            LocalDate.of(2024, Month.JULY, 10),
-            LocalDate.of(2024, Month.JULY, 20)
+            LocalDate.of(2024, Month.JULY, 5),
+            LocalDate.of(2024, Month.JULY, 10)
         );
 
         request.setPricesPerInterval(List.of(interval1, interval2, interval3));
@@ -205,11 +205,11 @@ class AccommodationTest {
         var sortedDates = localDates.stream().sorted().toList();
         assertThat(localDates, is(sortedDates));
 
-        var specificDate = LocalDate.of(2024, Month.APRIL, 10);
+        var specificDate = LocalDate.of(2024, Month.JULY, 11);
         int index = localDates.indexOf(specificDate);
         assert index != -1;
 
-        specificDate = LocalDate.of(2024, Month.APRIL, 11);
+        specificDate = LocalDate.of(2024, Month.JULY, 12);
         index = localDates.indexOf(specificDate);
         assert index != -1;
 
