@@ -8,7 +8,8 @@ VALUES
 INSERT INTO reservation (accommodation_id, guestusername, state, numofguests, fromdate, todate, totalprice)
 VALUES
     (1, 'guestUser1', 'CONFIRMED', 2, '2024-07-10', '2024-07-14', 600.00),
-    (2, 'guestUser2', 'PENDING', 1, '2024-07-12', '2024-07-16', 400.00);
+    (2, 'guestUser2', 'PENDING', 1, '2024-07-12', '2024-07-16', 400.00),
+    (2, 'guestUser1', 'APPROVED', 2, '2024-07-21', '2024-07-22', 600.00);
 
 INSERT INTO priceadjustmentdate (date, price,reservation_id)
 VALUES
@@ -17,6 +18,8 @@ VALUES
     ('2024-07-12', 150,1),
     ('2024-07-13', 150,1),
     ('2024-07-14', 150,1),
+    ('2024-07-21', 290, 3),
+    ('2024-07-22', 290, 3),
 
     ('2024-07-10', 100,null),
     ('2024-07-11', 100,null),
@@ -28,7 +31,15 @@ VALUES
     ('2024-07-13', 250,null),
     ('2024-07-14', 250,null),
     ('2024-07-15', 250,null),
-    ('2024-07-16', 250,null);
+    ('2024-07-16', 250,null),
+    ('2024-04-10', 200,null),
+    ('2024-04-11', 200,null),
+    ('2024-04-12', 200,null),
+    ('2024-04-13', 200,null),
+    ('2024-04-15', 220,null),
+    ('2024-04-16', 220,null),
+    ('2024-04-17', 220,null),
+    ('2024-04-18', 220,null);
 
 INSERT INTO priceadjustment (accommodation_id, price_adjustment_date_id)
 VALUES
