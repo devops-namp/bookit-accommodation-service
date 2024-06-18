@@ -3,11 +3,14 @@ package uns.ac.rs.repository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustmentDate;
+import uns.ac.rs.entity.Reservation;
+import uns.ac.rs.entity.events.AutoApproveEvent;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -144,5 +147,15 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
 
     public void deleteByHost(String username) {
         update("deleted = true where hostUsername = ?1", username);
+    }
+    @Transactional
+    public void changeAutoapproveInAccommodations(AutoApproveEvent event) {
+        update("autoApprove = ?1 where hostUsername = ?2",
+                event.isAutoapprove(), event.getUsername());
+    }
+
+    @Transactional
+    public List<Accommodation> findByHostUsername(String hostUsername) {
+        return list("hostUsername", hostUsername);
     }
 }

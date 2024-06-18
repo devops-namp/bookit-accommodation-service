@@ -29,7 +29,7 @@ public class ReservationDtoToSend {
                 toDate,
                 numOfGusts,
                 totalPrice,
-                reservation.getState()
+                String.valueOf(reservation.getState())
         );
     }
 
@@ -41,7 +41,7 @@ public class ReservationDtoToSend {
         setNumOfGusts(r.getNumOfGuests());
         setTotalPrice(r.getTotalPrice());
         setGuestUsername(r.getGuestUsername());
-        setState(r.getState());
+        setState(String.valueOf(r.getState()));
 
     }
 }

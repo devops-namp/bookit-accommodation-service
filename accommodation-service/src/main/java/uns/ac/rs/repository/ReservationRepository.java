@@ -2,7 +2,9 @@ package uns.ac.rs.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
+import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.Reservation;
 
 import java.time.LocalDate;
@@ -37,7 +39,36 @@ public class ReservationRepository implements PanacheRepository<Reservation> {
 
     @Transactional
     public void reject(Long reservationId) {
-        update("status = ?1 where id = ?2", "REJECTED", reservationId);
+        update("state = ?1 where id = ?2", "REJECTED", reservationId);
+    }
+
+
+    public void rejectOthers(Reservation r) {
+        update("state = ?1 where accommodation.id = ?2 and id != ?3 and " +
+                        "(fromDate <= ?5 and toDate >= ?4)",
+                Reservation.ReservationState.DECLINED, r.getAccommodation().getId(), r.getId(), r.getFromDate(), r.getToDate());
+    }
+    public List<Reservation> findByHostUsername(String hostUsername) {
+        return getEntityManager()
+                .createQuery("SELECT r FROM Reservation r WHERE r.accommodation.hostUsername = :hostUsername", Reservation.class)
+                .setParameter("hostUsername", hostUsername)
+                .getResultList();
+    }
+    private void updateState(Long reservationId, Reservation.ReservationState state) {
+        update("state = ?1 WHERE id = ?2", state.toString(), reservationId);
+    }
+
+    public Reservation findFirstPending(String hostUsername) {
+        try {
+            return getEntityManager()
+                    .createQuery("SELECT r FROM Reservation r WHERE r.accommodation.hostUsername = :hostUsername AND r.state = :state", Reservation.class)
+                    .setParameter("hostUsername", hostUsername)
+                    .setParameter("state", Reservation.ReservationState.PENDING)
+                    .setMaxResults(1)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public void deleteByHost(String username) {
