@@ -17,8 +17,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
 @QuarkusTestResource(PostgresResource.class)
@@ -135,7 +134,7 @@ class AccommodationTest {
             .response();
 
         List<Object> priceAdjustments = response.jsonPath().getList("priceAdjustments");
-        assertThat(priceAdjustments, hasSize(62));
+        assertThat(priceAdjustments, hasSize(67));
 
         List<String> datesStr = response.jsonPath().getList("priceAdjustments.priceAdjustmentDate.date");
         var localDates = datesStr.stream().map(LocalDate::parse).toList();
