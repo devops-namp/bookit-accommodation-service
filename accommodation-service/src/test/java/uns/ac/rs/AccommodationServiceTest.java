@@ -37,6 +37,9 @@ class AccommodationServiceTest {
     @Mock
     PriceAdjustmentDateRepository priceAdjustmentDateRepository;
 
+    @Mock
+    ReservationRepository reservationRepository;
+
     @InjectMocks
     AccommodationService accommodationService;
 
@@ -111,9 +114,8 @@ class AccommodationServiceTest {
 
         when(accommodationRepository.findByIdOptional(accommodationId)).thenReturn(Optional.empty());
 
-        var result = accommodationService.adjustPrices(accommodationId, newPrices);
+        assertThrows(AccommodationNotFoundException.class, () -> accommodationService.adjustPrices(accommodationId, newPrices));
 
-        assertNull(result);
         verify(accommodationRepository, times(1)).findByIdOptional(accommodationId);
         verify(priceAdjustmentRepository, never()).delete(any());
         verifyNoInteractions(priceAdjustmentRepository);
@@ -122,7 +124,7 @@ class AccommodationServiceTest {
     }
 
     @Test
-    public void testAdjustPrices_AccommodationFound() {
+    public void testAdjustPrices_AccommodationFound_NoReservations() {
         Long accommodationId = 1L;
         Map<LocalDate, Double> newPrices = new HashMap<>();
         newPrices.put(LocalDate.of(2024, 4, 15), 500.0);
@@ -133,6 +135,7 @@ class AccommodationServiceTest {
         accommodation.setPriceAdjustments(new ArrayList<>());
 
         when(accommodationRepository.findByIdOptional(accommodationId)).thenReturn(Optional.of(accommodation));
+        when(reservationRepository.exists(any(), any())).thenReturn(false);
 
         var result = accommodationService.adjustPrices(accommodationId, newPrices);
 
