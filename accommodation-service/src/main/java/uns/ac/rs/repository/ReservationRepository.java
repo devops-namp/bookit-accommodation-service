@@ -20,8 +20,9 @@ public class ReservationRepository implements PanacheRepository<Reservation> {
         return list("SELECT r FROM Reservation r WHERE r.guestUsername = ?1", username);
     }
 
-    public boolean exists(LocalDate date) {
-        return false;
+    public boolean exists(Long accommodationId, LocalDate date) {
+        return list("SELECT r FROM Reservation r where r.accommodation.id = ?1 AND " +
+            "r.fromDate <= ?2 AND r.toDate >= ?2 AND (r.state = 'PENDING' OR r.state = 'APPROVED')", accommodationId, date).size() > 0;
     }
 
     @Transactional
