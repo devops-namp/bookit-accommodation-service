@@ -147,13 +147,66 @@ class AccommodationServiceTest {
         assertEquals(LocalDate.of(2024, 4, 17), result.getPriceAdjustments().get(1).getPriceAdjustmentDate().getDate());
 
         verify(accommodationRepository, times(1)).findByIdOptional(accommodationId);
-        verify(priceAdjustmentRepository, times(4)).persist(any(PriceAdjustment.class));
+        verify(priceAdjustmentRepository, times(2)).persist(any(PriceAdjustment.class));
         verify(priceAdjustmentDateRepository, times(2)).persist(any(PriceAdjustmentDate.class));
         verify(accommodationRepository, times(1)).persist(accommodation);
     }
 
     @Test
-    public void testAdjustPrices_ExistingPriceAdjustmentsDeleted() {
+    public void testAdjustPrices_WithExistingPrices_NoReservations() {
+        Long accommodationId = 1L;
+        Map<LocalDate, Double> newPrices = new HashMap<>();
+        newPrices.put(LocalDate.of(2024, 4, 15), 500.0);
+        newPrices.put(LocalDate.of(2024, 10, 11), 200.0);
+        newPrices.put(LocalDate.of(2024, 3, 15), 1500.0);
+
+        var accommodation = new Accommodation();
+        accommodation.setId(accommodationId);
+
+        var priceAdjustments = new ArrayList<PriceAdjustment>();
+        var existingPriceAdjustment = new PriceAdjustment();
+        existingPriceAdjustment.setAccommodation(accommodation);
+        existingPriceAdjustment.setPriceAdjustmentDate(new PriceAdjustmentDate(LocalDate.of(2024, 10, 10), 10));
+        priceAdjustments.add(existingPriceAdjustment);
+
+        existingPriceAdjustment = new PriceAdjustment();
+        existingPriceAdjustment.setAccommodation(accommodation);
+        existingPriceAdjustment.setPriceAdjustmentDate(new PriceAdjustmentDate(LocalDate.of(2024, 10, 11), 11));
+        priceAdjustments.add(existingPriceAdjustment);
+
+        existingPriceAdjustment = new PriceAdjustment();
+        existingPriceAdjustment.setAccommodation(accommodation);
+        existingPriceAdjustment.setPriceAdjustmentDate(new PriceAdjustmentDate(LocalDate.of(2024, 10, 12), 12));
+        priceAdjustments.add(existingPriceAdjustment);
+
+        accommodation.setPriceAdjustments(priceAdjustments);
+
+        when(accommodationRepository.findByIdOptional(accommodationId)).thenReturn(Optional.of(accommodation));
+        when(reservationRepository.exists(any(), any())).thenReturn(false);
+
+        var result = accommodationService.adjustPrices(accommodationId, newPrices);
+
+        assertNotNull(result);
+        assertEquals(5, result.getPriceAdjustments().size());
+        assertEquals(1500.0, result.getPriceAdjustments().get(0).getPriceAdjustmentDate().getPrice());
+        assertEquals(500.0, result.getPriceAdjustments().get(1).getPriceAdjustmentDate().getPrice());
+        assertEquals(10.0, result.getPriceAdjustments().get(2).getPriceAdjustmentDate().getPrice());
+        assertEquals(200.0, result.getPriceAdjustments().get(3).getPriceAdjustmentDate().getPrice());
+        assertEquals(12.0, result.getPriceAdjustments().get(4).getPriceAdjustmentDate().getPrice());
+        assertEquals(LocalDate.of(2024, 3, 15), result.getPriceAdjustments().get(0).getPriceAdjustmentDate().getDate());
+        assertEquals(LocalDate.of(2024, 4, 15), result.getPriceAdjustments().get(1).getPriceAdjustmentDate().getDate());
+        assertEquals(LocalDate.of(2024, 10, 10), result.getPriceAdjustments().get(2).getPriceAdjustmentDate().getDate());
+        assertEquals(LocalDate.of(2024, 10, 11), result.getPriceAdjustments().get(3).getPriceAdjustmentDate().getDate());
+        assertEquals(LocalDate.of(2024, 10, 12), result.getPriceAdjustments().get(4).getPriceAdjustmentDate().getDate());
+
+        verify(accommodationRepository, times(1)).findByIdOptional(accommodationId);
+        verify(priceAdjustmentRepository, times(2)).persist(any(PriceAdjustment.class));
+        verify(priceAdjustmentDateRepository, times(3)).persist(any(PriceAdjustmentDate.class));
+        verify(accommodationRepository, times(1)).persist(accommodation);
+    }
+
+    @Test
+    public void testAdjustPrices_WithExistingPrices_WithReservations() {
         Long accommodationId = 1L;
         Map<LocalDate, Double> newPrices = new HashMap<>();
         newPrices.put(LocalDate.of(2024, 4, 15), 500.0);
@@ -167,19 +220,67 @@ class AccommodationServiceTest {
         accommodation.setPriceAdjustments(new ArrayList<>(Arrays.asList(existingPriceAdjustment)));
 
         when(accommodationRepository.findByIdOptional(accommodationId)).thenReturn(Optional.of(accommodation));
+        when(reservationRepository.exists(any(), any())).thenReturn(true);
 
-        var result = accommodationService.adjustPrices(accommodationId, newPrices);
-
-        assertNotNull(result);
-        assertEquals(1, result.getPriceAdjustments().size());
-        assertEquals(500.0, result.getPriceAdjustments().get(0).getPriceAdjustmentDate().getPrice());
-        assertEquals(LocalDate.of(2024, 4, 15), result.getPriceAdjustments().get(0).getPriceAdjustmentDate().getDate());
+        assertThrows(ReservationExistsOnDateException.class, () -> accommodationService.adjustPrices(accommodationId, newPrices));
 
         verify(accommodationRepository, times(1)).findByIdOptional(accommodationId);
-        verify(priceAdjustmentRepository, times(1)).delete(existingPriceAdjustment);
-        verify(priceAdjustmentRepository, times(2)).persist(any(PriceAdjustment.class));
-        verify(priceAdjustmentDateRepository, times(1)).persist(any(PriceAdjustmentDate.class));
-        verify(accommodationRepository, times(1)).persist(accommodation);
+        verifyNoInteractions(priceAdjustmentRepository);
+        verifyNoInteractions(priceAdjustmentDateRepository);
+        verify(accommodationRepository, times(0)).persist(accommodation);
+    }
+
+    @Test
+    public void testRemovePrices_Success() {
+        Long accommodationId = 1L;
+        var toRemove = Set.of(LocalDate.of(2024, 6, 15));
+
+        var accommodation = new Accommodation();
+        var priceAdjustment = new PriceAdjustment();
+        priceAdjustment.setPriceAdjustmentDate(new PriceAdjustmentDate(LocalDate.of(2024, 6, 15), 100));
+        priceAdjustment.setId(100L);
+
+        accommodation.setPriceAdjustments(List.of(priceAdjustment));
+
+        when(accommodationRepository.findByIdOptional(accommodationId)).thenReturn(Optional.of(accommodation));
+        when(reservationRepository.exists(accommodationId, LocalDate.of(2024, 6, 15))).thenReturn(false);
+
+        var result = accommodationService.removePrices(accommodationId, toRemove);
+
+        assertNotNull(result);
+        assertTrue(result.getPriceAdjustments().isEmpty());
+
+        verify(priceAdjustmentRepository, times(1)).deleteById(100L);
+        verify(accommodationRepository, times(1)).persist(any(Accommodation.class));
+    }
+
+    @Test
+    public void testRemovePrices_AccommodationNotFound() {
+        var accommodationId = 1L;
+        var toRemove = Set.of(LocalDate.of(2024, 6, 15));
+
+        when(accommodationRepository.findByIdOptional(accommodationId)).thenReturn(Optional.empty());
+
+        assertThrows(AccommodationNotFoundException.class, () -> accommodationService.removePrices(accommodationId, toRemove));
+        verifyNoInteractions(priceAdjustmentRepository);
+        verify(accommodationRepository, never()).persist(any(Accommodation.class));
+    }
+
+    @Test
+    public void testRemovePrices_ReservationExistsOnDate() {
+        Long accommodationId = 1L;
+        Set<LocalDate> toRemove = Set.of(LocalDate.of(2024, 6, 15));
+
+        Accommodation accommodation = new Accommodation();
+        PriceAdjustment priceAdjustment = new PriceAdjustment();
+        priceAdjustment.setPriceAdjustmentDate(new PriceAdjustmentDate(LocalDate.of(2024, 6, 15), 100));
+
+        accommodation.setPriceAdjustments(List.of(priceAdjustment));
+
+        when(accommodationRepository.findByIdOptional(accommodationId)).thenReturn(Optional.of(accommodation));
+        when(reservationRepository.exists(accommodationId, LocalDate.of(2024, 6, 15))).thenReturn(true);
+
+        assertThrows(ReservationExistsOnDateException.class, () -> accommodationService.removePrices(accommodationId, toRemove));
     }
 
     @Test
