@@ -7,6 +7,7 @@ import io.restassured.http.ContentType;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import uns.ac.rs.controlller.request.AdjustPriceRequest;
+import uns.ac.rs.controlller.request.RemovePriceRequest;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.resources.PostgresResource;
 
@@ -164,6 +165,90 @@ class AccommodationTest {
         assert index != -1;
         price = response.jsonPath().getDouble("priceAdjustments[" + index + "].priceAdjustmentDate.price");
         assertThat(price, is(100.0));
+    }
+
+    @Test
+    @TestSecurity(user = "host", roles = "HOST")
+    void testRemovePrices() {
+        var request = new RemovePriceRequest();
+
+        var interval1 = new RemovePriceRequest.IntervalPrice(
+            LocalDate.of(2024, Month.APRIL, 12),
+            LocalDate.of(2024, Month.APRIL, 17)
+        );
+        var interval2 = new RemovePriceRequest.IntervalPrice(
+            LocalDate.of(2024, Month.APRIL, 15),
+            LocalDate.of(2024, Month.APRIL, 18)
+        );
+        var interval3 = new RemovePriceRequest.IntervalPrice(
+            LocalDate.of(2024, Month.JULY, 10),
+            LocalDate.of(2024, Month.JULY, 20)
+        );
+
+        request.setPricesPerInterval(List.of(interval1, interval2, interval3));
+
+        var response = given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().delete("/accommodation/price/2")
+            .then()
+            .statusCode(200)
+            .body("id", CoreMatchers.is(2))
+            .extract()
+            .response();
+
+        List<Object> priceAdjustments = response.jsonPath().getList("priceAdjustments");
+        assertThat(priceAdjustments, hasSize(4));
+
+        List<String> datesStr = response.jsonPath().getList("priceAdjustments.priceAdjustmentDate.date");
+        var localDates = datesStr.stream().map(LocalDate::parse).toList();
+        var sortedDates = localDates.stream().sorted().toList();
+        assertThat(localDates, is(sortedDates));
+
+        var specificDate = LocalDate.of(2024, Month.APRIL, 10);
+        int index = localDates.indexOf(specificDate);
+        assert index != -1;
+
+        specificDate = LocalDate.of(2024, Month.APRIL, 11);
+        index = localDates.indexOf(specificDate);
+        assert index != -1;
+
+        specificDate = LocalDate.of(2024, Month.JULY, 21);
+        index = localDates.indexOf(specificDate);
+        assert index != -1;
+
+        specificDate = LocalDate.of(2024, Month.JULY, 22);
+        index = localDates.indexOf(specificDate);
+        assert index != -1;
+    }
+
+    @Test
+    @TestSecurity(user = "host", roles = "HOST")
+    void testRemovePrices_reservationExists() {
+        var request = new RemovePriceRequest();
+
+        var interval1 = new RemovePriceRequest.IntervalPrice(
+            LocalDate.of(2024, Month.APRIL, 12),
+            LocalDate.of(2024, Month.APRIL, 17)
+        );
+        var interval2 = new RemovePriceRequest.IntervalPrice(
+            LocalDate.of(2024, Month.APRIL, 15),
+            LocalDate.of(2024, Month.APRIL, 18)
+        );
+        var interval3 = new RemovePriceRequest.IntervalPrice(
+            LocalDate.of(2024, Month.JULY, 18),
+            LocalDate.of(2024, Month.JULY, 21)
+        );
+
+        request.setPricesPerInterval(List.of(interval1, interval2, interval3));
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().delete("/accommodation/price/2")
+            .then()
+            .statusCode(400)
+            .body(containsString("Unable to update availability because reservation exists in chosen interval"));
     }
 
     @Test
