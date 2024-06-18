@@ -5,6 +5,7 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import org.jboss.resteasy.reactive.ResponseStatus;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.controlller.dto.DateInfoDto;
@@ -108,7 +109,7 @@ public class AccommodationController {
 
     @PUT
     @Path("/price/{id}")
-    // @RolesAllowed({ "HOST" })
+    @RolesAllowed({ "HOST" })
     public Response adjustPrices(@PathParam("id") Long id, AdjustPriceRequest request) {
         Map<LocalDate, Double> newPricesMap = new HashMap<>();
         System.out.println("Adding prices for accommodation: " + id);
@@ -126,9 +127,6 @@ public class AccommodationController {
         });
 
         var accommodation = accommodationService.adjustPrices(id, newPricesMap);
-        if (accommodation == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
         return Response.ok(new AccommodationDto(accommodation)).build();
     }
 
@@ -136,20 +134,17 @@ public class AccommodationController {
     @Path("/price/{id}")
     @RolesAllowed({ "HOST" })
     public Response removePrices(@PathParam("id") Long id, RemovePriceRequest request) {
-        List<LocalDate> newPricesMap = new ArrayList<>();
+        Set<LocalDate> newPrices = new HashSet<>();
         System.out.println("Removing prices for accommodation: " + id);
 
         request.getPricesPerInterval().forEach(intervalPrice -> {
             var startDate = intervalPrice.getStartDate();
             var endDate = intervalPrice.getEndDate();
-            startDate.datesUntil(endDate.plusDays(1)).forEach(newPricesMap::add);
+            startDate.datesUntil(endDate.plusDays(1)).forEach(newPrices::add);
             System.out.println("Removed price for interval: " + startDate + " - " + endDate);
         });
 
-        var accommodation = accommodationService.removePrices(id, newPricesMap);
-        if (accommodation == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        var accommodation = accommodationService.removePrices(id, newPrices);
         return Response.ok(new AccommodationDto(accommodation)).build();
     }
 
