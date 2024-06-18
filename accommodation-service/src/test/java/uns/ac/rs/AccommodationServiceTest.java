@@ -11,9 +11,12 @@ import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
+import uns.ac.rs.exceptions.AccommodationNotFoundException;
+import uns.ac.rs.exceptions.ReservationExistsOnDateException;
 import uns.ac.rs.repository.AccommodationRepository;
 import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
+import uns.ac.rs.repository.ReservationRepository;
 import uns.ac.rs.service.AccommodationService;
 
 import java.time.LocalDate;
