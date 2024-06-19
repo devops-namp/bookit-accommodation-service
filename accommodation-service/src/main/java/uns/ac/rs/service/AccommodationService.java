@@ -48,6 +48,7 @@ public class AccommodationService {
 
     @Transactional
     public Accommodation addAccommodation(Accommodation accommodation) {
+        accommodation.setDeleted(false);
         accommodationRepository.persist(accommodation);
         System.out.println("Assigned ID: " + accommodation.getId());
         return accommodation;

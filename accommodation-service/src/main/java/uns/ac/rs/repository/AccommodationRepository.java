@@ -12,17 +12,29 @@ import uns.ac.rs.entity.PriceAdjustmentDate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class AccommodationRepository implements PanacheRepository<Accommodation> {
+
+    @Override
+    public List<Accommodation> listAll() {
+        return list("SELECT a FROM Accommodation a WHERE NOT a.deleted");
+    }
+
+    @Override
+    public Optional<Accommodation> findByIdOptional(Long id) {
+        return find("SELECT a FROM Accommodation a WHERE NOT a.deleted AND a.id = ?1", id).singleResultOptional();
+    }
+
     public List<AccommodationWithPrice> search(String name, String location, List<String> filters, Integer numGuests,
                                                LocalDate fromDate, LocalDate toDate, Double fromPrice, Double toPrice, String priceType) {
         StringBuilder query = new StringBuilder("SELECT a FROM Accommodation a " +
                 "LEFT JOIN a.priceAdjustments pa " +
                 "LEFT JOIN pa.priceAdjustmentDate pad " +
                 "LEFT JOIN a.reservations r " +
-                "WHERE 1=1");
+                "WHERE NOT a.deleted");
 
         if (name != null) {
             query.append(" AND a.name LIKE CONCAT('%', :name, '%')");
@@ -128,10 +140,6 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
                         pad.getReservation() == null ? "Available" : "Reserved"
                 ))
                 .collect(Collectors.toList());
-    }
-
-    public List<Accommodation> getByHost(String username) {
-        return list("SELECT a FROM Accommodation a WHERE a.hostUsername = ?1", username);
     }
 
     public void deleteByHost(String username) {
