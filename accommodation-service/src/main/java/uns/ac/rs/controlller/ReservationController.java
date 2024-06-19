@@ -1,10 +1,12 @@
 package uns.ac.rs.controlller;
 
+import io.vertx.core.json.JsonObject;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
@@ -110,4 +112,8 @@ public class ReservationController {
         return Response.ok(new ReservationsCheckDto(result)).build();
     }
 
+    @Incoming("delete-accommodation-queue")
+    public void deleteHostsAccommodations(String hostUsername) {
+        accommodationService.deleteAccommodation(hostUsername);
+    }
 }
