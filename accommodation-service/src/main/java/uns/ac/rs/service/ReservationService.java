@@ -42,8 +42,15 @@ public class ReservationService {
         return reservationDtoToSends;
     }
 
-    public Optional<Reservation> findById(Long id) {
-        return reservationRepository.findByIdOptional(id);
+    public Optional<ReservationDtoToSend> findById(Long id) {
+        Optional<Reservation> optionalReservation = reservationRepository.findByIdOptional(id);
+
+        if (optionalReservation.isPresent()) {
+            ReservationDtoToSend reservationDtoToSend = new ReservationDtoToSend(optionalReservation.get());
+            return Optional.of(reservationDtoToSend);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Transactional

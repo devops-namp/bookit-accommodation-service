@@ -33,7 +33,7 @@ public class ReservationController {
     @GET
     @Path("/{id}")
     public Response findById(@PathParam("id") Long id) {
-        Optional<Reservation> reservation = reservationService.findById(id);
+        Optional<ReservationDtoToSend> reservation = reservationService.findById(id);
         return reservation.map(value -> Response.ok(value).build())
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
     }
