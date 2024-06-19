@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uns.ac.rs.controlller.dto.ReservationDto;
+import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.Reservation;
 import uns.ac.rs.repository.ReservationRepository;
@@ -41,10 +42,16 @@ class ReservationServiceTest {
 
     @Test
     void testGetAll() {
-        List<Reservation> reservations = List.of(new Reservation());
+        Accommodation accommodation = new Accommodation();
+        accommodation.setId(1L);
+
+        Reservation reservation = new Reservation();
+        reservation.setAccommodation(accommodation);
+
+        List<Reservation> reservations = List.of(reservation);
         when(reservationRepository.listAll()).thenReturn(reservations);
 
-        List<Reservation> result = reservationService.listAll();
+        List<ReservationDtoToSend> result = reservationService.listAll();
         assertEquals(1, result.size());
         verify(reservationRepository, times(1)).listAll();
     }

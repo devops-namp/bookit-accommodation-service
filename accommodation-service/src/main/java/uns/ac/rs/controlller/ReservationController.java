@@ -26,7 +26,7 @@ public class ReservationController {
     AccommodationService accommodationService;
 
     @GET
-    public List<Reservation> listAll() {
+    public List<ReservationDtoToSend> listAll() {
         return reservationService.listAll();
     }
 
