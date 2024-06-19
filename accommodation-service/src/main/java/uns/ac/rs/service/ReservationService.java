@@ -3,6 +3,7 @@ package uns.ac.rs.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.Accommodation;
@@ -11,6 +12,7 @@ import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,8 +32,14 @@ public class ReservationService {
     @Inject
     AccommodationService accommodationService;
 
-    public List<Reservation> listAll() {
-        return reservationRepository.listAll();
+    public List<ReservationDtoToSend> listAll() {
+        List<ReservationDtoToSend> reservationDtoToSends = new ArrayList<>();
+        for(Reservation reservation : reservationRepository.listAll()){
+            ReservationDtoToSend reservationDtoToSend = new ReservationDtoToSend(reservation,String.valueOf(reservation.getFromDate()),String.valueOf(reservation.getToDate()),reservation.getNumOfGuests(), reservation.getTotalPrice(),new AccommodationDto(reservation.getAccommodation()));
+            reservationDtoToSends.add(reservationDtoToSend);
+        }
+
+        return reservationDtoToSends;
     }
 
     public Optional<Reservation> findById(Long id) {
