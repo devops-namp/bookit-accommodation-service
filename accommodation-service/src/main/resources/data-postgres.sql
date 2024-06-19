@@ -2,13 +2,15 @@ INSERT INTO public."bookit-accommodation" (name, hostusername, location, filters
 VALUES
 ('Mountain Cabin Retreat', 'username2', 'Aspen', 'wifi,parking,fireplace,bath', 2, 6, 'price_per_person'),
 ('City Center Studio',  'host2', 'New York', 'wifi,parking,tv', 1, 2, 'price_per_person'),
-('Beachfront Condo', 'host2', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_unit');
+('Beachfront Condo', 'host2', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_unit'),
+('Beachfront Condo123', 'username3', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_person');
 
 
 INSERT INTO reservation (accommodation_id, guestusername, state, numofguests, fromdate, todate, totalprice)
 VALUES
-(1, 'guestUser1', 'CONFIRMED', 2, '2024-07-10', '2024-07-14', 600.00),
-(2, 'guestUser2', 'PENDING', 1, '2024-07-12', '2024-07-16', 400.00);
+(1, 'guestUser1', 'APPROVED', 2, '2024-07-10', '2024-07-14', 600.00),
+(2, 'guestUser2', 'PENDING', 1, '2024-07-12', '2024-07-16', 400.00),
+(4, 'guestUser2', 'APPROVED', 1, '2024-01-12', '2024-01-16', 500.00);
 
 INSERT INTO priceadjustmentdate (date, price,reservation_id)
 VALUES
@@ -28,7 +30,13 @@ VALUES
 ('2024-07-13', 250,null),
 ('2024-07-14', 250,null),
 ('2024-07-15', 250,null),
-('2024-07-16', 250,null);
+('2024-07-16', 250,null),
+
+('2024-07-10', 100,3),
+('2024-07-11', 150,3),
+('2024-07-12', 250,3),
+('2024-07-13', 250,3),
+('2024-07-14', 150,3);
 
 INSERT INTO priceadjustment (accommodation_id, price_adjustment_date_id)
 VALUES
@@ -46,4 +54,9 @@ VALUES
 (3, 12),
 (3, 13),
 (3, 14),
-(3, 15);
+(3, 15),
+(4, 16),
+(4, 17),
+(4, 18),
+(4, 19),
+(4, 20);
