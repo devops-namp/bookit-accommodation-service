@@ -41,6 +41,7 @@ public class Reservation {
     private LocalDate fromDate;
     private LocalDate toDate;
     private double totalPrice;
+    private Boolean deleted;
 
     public Reservation(ReservationDto reservationDto, Accommodation accommodation) {
         setAccommodation(accommodation);
@@ -52,6 +53,7 @@ public class Reservation {
         setFromDate(Utils.convertToLocaldate(reservationDto.getFromDate()));
         setToDate(Utils.convertToLocaldate(reservationDto.getToDate()));
         setTotalPrice(reservationDto.getTotalPrice());
+        setDeleted(false);
     }
 
 

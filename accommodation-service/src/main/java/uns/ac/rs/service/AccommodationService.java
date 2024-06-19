@@ -6,10 +6,7 @@ import jakarta.transaction.Transactional;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.controlller.dto.DateInfoDto;
-import uns.ac.rs.entity.Accommodation;
-import uns.ac.rs.entity.Image;
-import uns.ac.rs.entity.PriceAdjustment;
-import uns.ac.rs.entity.PriceAdjustmentDate;
+import uns.ac.rs.entity.*;
 import uns.ac.rs.exceptions.AccommodationNotFoundException;
 import uns.ac.rs.exceptions.ReservationExistsOnDateException;
 import uns.ac.rs.repository.*;
@@ -105,6 +102,7 @@ public class AccommodationService {
     @Transactional
     public void deleteAccommodation(String hostUsername) {
         accommodationRepository.deleteByHost(hostUsername);
+        reservationRepository.deleteByHost(hostUsername);
     }
 
     @Transactional
