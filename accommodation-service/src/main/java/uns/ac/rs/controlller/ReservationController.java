@@ -1,19 +1,16 @@
 package uns.ac.rs.controlller;
 
-import io.vertx.core.json.JsonObject;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
 import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
+import uns.ac.rs.controlller.dto.ReservationsCheckDto;
+import uns.ac.rs.controlller.request.CheckReservationsRequest;
 import uns.ac.rs.entity.Reservation;
-import uns.ac.rs.messages.UserProfileDeletionRequest;
 import uns.ac.rs.service.AccommodationService;
 import uns.ac.rs.service.ReservationService;
 
@@ -29,10 +26,6 @@ public class ReservationController {
     ReservationService reservationService;
     @Inject
     AccommodationService accommodationService;
-
-    @Inject
-    @Channel("profile-deletion-response-queue")
-    Emitter<Boolean> emitter;
 
     @GET
     public List<ReservationDtoToSend> listAll() {
@@ -109,13 +102,12 @@ public class ReservationController {
         return Response.ok().build();
     }
 
-    @Incoming("profile-deletion-request-queue")
-    public void checkReservationsForProfileDeletion(JsonObject json) {
-        var request = json.mapTo(UserProfileDeletionRequest.class);
-        var hasFutureReservations = reservationService.hasFutureReservations(request.getUsername(), request.getRole());
-        if (hasFutureReservations) {
-            emitter.send(true);
-        }
+    @GET
+    @Path("/check")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response checkFutureReservations(CheckReservationsRequest request) {
+        var result = reservationService.hasFutureReservations(request.getUsername(), request.getRole());
+        return Response.ok(new ReservationsCheckDto(result)).build();
     }
 
 }
