@@ -41,7 +41,7 @@ public class Reservation {
     private LocalDate fromDate;
     private LocalDate toDate;
     private double totalPrice;
-    private Boolean deleted;
+    private boolean deleted;
 
     public Reservation(ReservationDto reservationDto, Accommodation accommodation) {
         setAccommodation(accommodation);
