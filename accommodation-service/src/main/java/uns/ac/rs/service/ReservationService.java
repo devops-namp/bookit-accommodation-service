@@ -13,6 +13,7 @@ import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
 
 import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -119,6 +120,22 @@ public class ReservationService {
     }
     public void reject(Long reservationId) {
         reservationRepository.reject(reservationId);
+    }
+
+    public boolean hasFutureReservations(String username, String role) {
+        if (role.equals("GUEST")) {
+            return reservationRepository.getByGuest(username)
+                .stream()
+                .filter(reservation -> reservation.getState().equals("APPROVED") && reservation.getToDate().isAfter(LocalDate.now()))
+                .toList().size() > 0;
+        }
+        if (role.equals("HOST")) {
+            return reservationRepository.getByHost(username)
+                .stream()
+                .filter(reservation -> reservation.getState().equals("APPROVED") && reservation.getToDate().isAfter(LocalDate.now()))
+                .toList().size() > 0;
+        }
+        return false;
     }
 
 }
