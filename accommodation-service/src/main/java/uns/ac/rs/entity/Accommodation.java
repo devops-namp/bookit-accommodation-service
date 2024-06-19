@@ -30,7 +30,7 @@ public class Accommodation {
     private String priceType;
     private String hostUsername;
     private Boolean autoAcceptReservations;
-    private Boolean deleted;
+    private boolean deleted;
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PriceAdjustment> priceAdjustments;
