@@ -30,6 +30,7 @@ public class Accommodation {
     private String priceType;
     private String hostUsername;
     private Boolean autoAcceptReservations;
+    private Boolean deleted;
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<PriceAdjustment> priceAdjustments;
@@ -73,5 +74,6 @@ public class Accommodation {
         }
 
         this.reservations = new ArrayList<>();
+        this.deleted = false;
     }
 }

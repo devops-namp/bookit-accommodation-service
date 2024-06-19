@@ -130,7 +130,11 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
                 .collect(Collectors.toList());
     }
 
+    public List<Accommodation> getByHost(String username) {
+        return list("SELECT a FROM Accommodation a WHERE a.hostUsername = ?1", username);
+    }
+
     public void deleteByHost(String username) {
-        delete("DELETE FROM Accommodation a WHERE a.hostUsername = ?1", username);
+        update("deleted = true where hostUsername = ?1", username);
     }
 }

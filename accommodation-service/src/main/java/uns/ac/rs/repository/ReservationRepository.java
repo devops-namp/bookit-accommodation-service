@@ -3,7 +3,6 @@ package uns.ac.rs.repository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.Reservation;
 
 import java.time.LocalDate;
@@ -28,5 +27,9 @@ public class ReservationRepository implements PanacheRepository<Reservation> {
     @Transactional
     public void reject(Long reservationId) {
         update("status = ?1 where id = ?2", "REJECTED", reservationId);
+    }
+
+    public void deleteByHost(String username) {
+        update("deleted = true where accommodation.hostUsername = ?1", username);
     }
 }
