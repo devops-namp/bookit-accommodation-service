@@ -103,6 +103,11 @@ public class AccommodationService {
     }
 
     @Transactional
+    public void deleteAccommodation(String hostUsername) {
+        accommodationRepository.deleteByHost(hostUsername);
+    }
+
+    @Transactional
     public Accommodation adjustPrices(Long id, Map<LocalDate, Double> newPrices) {
         var accommodation = accommodationRepository.findByIdOptional(id).orElseThrow(AccommodationNotFoundException::new);
 

@@ -129,4 +129,8 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
                 ))
                 .collect(Collectors.toList());
     }
+
+    public void deleteByHost(String username) {
+        delete("DELETE FROM Accommodation a WHERE a.hostUsername = ?1", username);
+    }
 }
