@@ -39,7 +39,7 @@ public class ReservationRepository implements PanacheRepository<Reservation> {
 
     @Transactional
     public void reject(Long reservationId) {
-        update("state = ?1 where id = ?2", "REJECTED", reservationId);
+        update("state = ?1 where id = ?2", "DECLINED", reservationId);
     }
 
 

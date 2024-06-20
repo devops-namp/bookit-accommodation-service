@@ -9,7 +9,9 @@ import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.*;
+import uns.ac.rs.entity.events.AutoApproveEvent;
 import uns.ac.rs.entity.events.NotificationEvent;
+import uns.ac.rs.exception.ReservationCannotBeCancelledException;
 import uns.ac.rs.exception.ReservationNotFoundException;
 import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
@@ -39,6 +41,10 @@ public class ReservationService {
     @Inject
     @Channel("notification-queue")
     Emitter<NotificationEvent> eventEmitter;
+
+    @Inject
+    @Channel("autoapprove-acc-to-user-queue")
+    Emitter<AutoApproveEvent> autoApproveEmmiter;
 
     public List<ReservationDtoToSend> listAll() {
         List<ReservationDtoToSend> reservationDtoToSends = new ArrayList<>();
@@ -103,18 +109,21 @@ public class ReservationService {
 
 
     private void rejectOthers(Long reservationId) {
-        Reservation r = reservationRepository.findById(reservationId);
-        reservationRepository.rejectOthers(r);
+        Optional<Reservation> r = reservationRepository.findByIdOptional(reservationId);
+        if (r.isEmpty()) throw new ReservationNotFoundException("Reservation with id " + reservationId + " does not exist.");
+        reservationRepository.rejectOthers(r.get());
     }
 
     private void addPriceAdjuctmentDates(Long reservationId) {
-        Reservation reservationOptional = reservationRepository.findById(reservationId);
-        Accommodation accommodation = reservationOptional.getAccommodation();
+        Optional<Reservation> reservationOptional = reservationRepository.findByIdOptional(reservationId);
+        if (reservationOptional.isEmpty()) throw new IllegalArgumentException("Reservation not found");
+        Reservation reservation = reservationOptional.get();
+        Accommodation accommodation = reservation.getAccommodation();
 
         List<PriceAdjustment> priceAdjustments = priceAdjustmentRepository.findByAccommodationId(accommodation.getId());
         List<PriceAdjustmentDate> priceAdjustmentDates = new ArrayList<>();
-        LocalDate fromDate = reservationOptional.getFromDate().minusDays(1);
-        LocalDate toDate = reservationOptional.getToDate().plusDays(1);
+        LocalDate fromDate = reservation.getFromDate().minusDays(1);
+        LocalDate toDate = reservation.getToDate().plusDays(1);
 
         for (PriceAdjustment pa : priceAdjustments) {
             PriceAdjustmentDate pad = pa.getPriceAdjustmentDate();
@@ -122,11 +131,11 @@ public class ReservationService {
                 priceAdjustmentDates.add(pad);
             }
         }
-        reservationOptional.setPriceAdjustmentDate(priceAdjustmentDates);
-        reservationRepository.persist(reservationOptional);
+        reservation.setPriceAdjustmentDate(priceAdjustmentDates);
+        reservationRepository.persist(reservation);
 
         for(PriceAdjustmentDate priceAdjustmentDate : priceAdjustmentDates){
-            priceAdjustmentDate.setReservation(reservationOptional);
+            priceAdjustmentDate.setReservation(reservation);
             priceAdjustmentDateRepository.persist(priceAdjustmentDate);
         }
     }
@@ -184,23 +193,19 @@ public class ReservationService {
         }
         NotificationEvent e = new NotificationEvent(r.getGuestUsername(), text);
         eventEmitter.send(e);
-        System.out.println("Definitivno smo poslali poruku");
     }
 
     public void rejectByGuest(Long reservationId) {
-        // TODO povecaj brojac
         Reservation r = changeStatus(reservationId, Reservation.ReservationState.DECLINED);
-        System.out.println("IDEMO U POVECAVANJE BROJACA!!");
+        if (!r.getFromDate().isAfter(LocalDate.now().plusDays(1))) throw new ReservationCannotBeCancelledException("Reservation cannot be cancelled as it starts tomorrow or has already started");
         NotificationEvent e = new NotificationEvent(r.getGuestUsername(), r.getGuestUsername() + " canceled the reservation.");
         eventEmitter.send(e);
+        autoApproveEmmiter.send(new AutoApproveEvent(r.getGuestUsername(), AutoApproveEvent.AutoApproveEventType.INCREMENT));
         deletePriceAdjustments(r);
     }
 
     private void deletePriceAdjustments(Reservation r) {
-        // u ovoj metodi treba da pobrisem sve price adjustment koji imaju veze sa ovom rezervacijom
         priceAdjustmentDateRepository.clearReservationId(r.getId());
-        System.out.println("TREBALO BI DA SAM OBRISALA ");
-
     }
 
     public void hadleAutoapprove(Accommodation accommodation, Reservation created) {
