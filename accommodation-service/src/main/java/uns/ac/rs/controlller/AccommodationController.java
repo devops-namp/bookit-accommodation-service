@@ -77,6 +77,23 @@ public class AccommodationController {
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
     }
 
+    @GET
+    @Path("/ownersAccommodations/{ownerUsername}")
+    @PermitAll
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOwnersAccommodations(@PathParam("ownerUsername") String ownerUsername) {
+        List<AccommodationDto> accommodations = accommodationService.getOwnersAccommodations(ownerUsername);
+
+        if (accommodations == null || accommodations.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("No accommodations found for the specified owner.")
+                    .build();
+        }
+
+        return Response.ok(accommodations).build();
+    }
+
+
     @POST
     @RolesAllowed({"HOST"})
     public Response addAccommodation(AccommodationDto accommodationDto) {
