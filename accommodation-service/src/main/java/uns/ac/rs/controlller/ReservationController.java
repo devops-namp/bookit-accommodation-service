@@ -2,6 +2,7 @@ package uns.ac.rs.controlller;
 
 import io.vertx.core.json.JsonObject;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -14,6 +15,7 @@ import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.dto.ReservationsCheckDto;
 import uns.ac.rs.controlller.request.CheckReservationsRequest;
 import uns.ac.rs.entity.Reservation;
+import uns.ac.rs.exception.ReservationCannotBeCancelledException;
 import uns.ac.rs.service.AccommodationService;
 import uns.ac.rs.service.ReservationService;
 
@@ -72,6 +74,7 @@ public class ReservationController {
     }
     @GET
     @Path("getByHost/{username}")
+//    @RolesAllowed({ "HOST" })
     @PermitAll
     public Response getByHost(@PathParam("username") String username) {
         List<ReservationDtoToSend> retVal = reservationService.getByHost(username);
@@ -80,15 +83,16 @@ public class ReservationController {
 
     @GET
     @Path("getByGuest/{username}")
+//    @RolesAllowed({ "GUEST" })
     @PermitAll
     public Response getByGuest(@PathParam("username") String username) {
-        System.out.println("USLI SMO U TRAZENJE GOSTOVIH REZERVACIJA");
         List<ReservationDtoToSend> retVal = reservationService.getByGuest(username);
         return Response.ok(retVal).build();
     }
 
     @POST
     @Path("/approve/{reservationId}")
+//    @RolesAllowed({ "HOST" })
     @PermitAll
     public Response approveReservation(@PathParam("reservationId") Long reservationId) {
         reservationService.approve(reservationId);
@@ -97,19 +101,24 @@ public class ReservationController {
 
     @POST
     @Path("/rejectHost/{reservationId}")
+//    @RolesAllowed({ "HOST" })
     @PermitAll
     public Response rejectReservationHost(@PathParam("reservationId") Long reservationId) {
-        System.out.println("USLI SMO U ODBIJANJE REZERVACIJE HOST" + reservationId);
         reservationService.changeStatus(reservationId, Reservation.ReservationState.DECLINED);
         return Response.ok().build();
     }
 
     @POST
     @Path("/rejectGuest/{reservationId}")
+    //@RolesAllowed({ "GUEST"})
     @PermitAll
     public Response rejectReservationGuest(@PathParam("reservationId") Long reservationId) {
-        reservationService.rejectByGuest(reservationId);
-        return Response.ok().build();
+        try {
+            reservationService.rejectByGuest(reservationId);
+            return Response.ok().build();
+        } catch (ReservationCannotBeCancelledException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 
     @GET

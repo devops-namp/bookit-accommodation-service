@@ -7,6 +7,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustmentDate;
@@ -18,6 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class ReservationDto {
     private String accommodationId;
     private String guestUsername;

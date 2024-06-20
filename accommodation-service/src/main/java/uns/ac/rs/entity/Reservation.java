@@ -58,6 +58,7 @@ public class Reservation {
     }
 
 
+
     public enum ReservationState {
         PENDING, APPROVED, DECLINED
     }

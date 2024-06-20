@@ -40,14 +40,7 @@ public class AccommodationController {
     AccommodationService accommodationService;
 
     @Inject
-    ReservationService reservationService;
-
-    @Inject
     SecurityIdentity securityIdentity;
-
-    @Inject
-    @Channel("filter-request-queue")
-    Emitter<String> stringEmitter;
 
     Logger LOG = Logger.getLogger(String.valueOf(AccommodationController.class));
 
@@ -55,8 +48,6 @@ public class AccommodationController {
     @GET
     @PermitAll
     public List<AccommodationDto> getAll() {
-        System.out.println("Dobavi mi sve korisnike");
-        stringEmitter.send("dobavi");
         return accommodationService.getAll().stream().map(AccommodationDto::new).toList();
     }
 
@@ -69,18 +60,12 @@ public class AccommodationController {
 
     @Incoming("autoapprove-user-to-acc-queue")
     public void setAutoapprove(JsonObject json) {
-        System.out.println("PRIMILA SAM AUTOAPPROVE");
         AutoApproveEvent event = json.mapTo(AutoApproveEvent.class);
         if (event.getType().equals(AutoApproveEvent.AutoApproveEventType.GET_BY_USER)) {
             accommodationService.setAutoApprove(event);
-            System.out.println("Sve savrseno");
         } else if (event.getType().equals(AutoApproveEvent.AutoApproveEventType.CHANGE)) {
-            // treba u svim userovim akomodacijama postaviti na false
-            System.out.println("TREBA DA PROMENIM NA " + event.isAutoapprove());
             accommodationService.changeAutoapproveInAccommodations(event);
-            System.out.println("Pogasio sam sve");
         }
-
     }
 
     @GET

@@ -1,16 +1,18 @@
 package uns.ac.rs;
 
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uns.ac.rs.controlller.dto.AccommodationDto;
+import org.mockito.*;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.PriceAdjustment;
 import uns.ac.rs.entity.PriceAdjustmentDate;
+import uns.ac.rs.entity.events.AutoApproveEvent;
+import uns.ac.rs.entity.events.NotificationEvent;
+import uns.ac.rs.exception.AccommodationNotFoundException;
 import uns.ac.rs.exceptions.AccommodationNotFoundException;
 import uns.ac.rs.exceptions.ReservationExistsOnDateException;
 import uns.ac.rs.repository.AccommodationRepository;
@@ -18,7 +20,9 @@ import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
 import uns.ac.rs.service.AccommodationService;
+import uns.ac.rs.service.ReservationService;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -43,9 +47,28 @@ class AccommodationServiceTest {
     @InjectMocks
     AccommodationService accommodationService;
 
+    @InjectMocks
+    ReservationService reservationService;
+
+    @Mock
+    Emitter<AutoApproveEvent> autoApproveEmmiter;
+
+    @Mock
+    Emitter<NotificationEvent> eventEmitter;
+
+
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
+        setPrivateField(accommodationService, "autoApproveEmmiter", autoApproveEmmiter);
+        setPrivateField(reservationService, "eventEmitter", eventEmitter);
+    }
+
+    private void setPrivateField(Object target, String fieldName, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
     }
 
     @Test
@@ -446,4 +469,74 @@ class AccommodationServiceTest {
                 eq(0.0), eq(0.0), eq("price_per_unit")
         );
     }
+
+    @Test
+    void testGetAutoApprove() {
+        Long accommodationId = 1L;
+        String username = "testUser";
+
+        accommodationService.getAutoApprove(accommodationId, username);
+
+        verify(autoApproveEmmiter).send((AutoApproveEvent) argThat(event ->
+                event instanceof AutoApproveEvent &&
+                        ((AutoApproveEvent) event).getUsername().equals(username) &&
+                        ((AutoApproveEvent) event).getAccommodationId().equals(accommodationId) &&
+                        ((AutoApproveEvent) event).getType() == AutoApproveEvent.AutoApproveEventType.GET_BY_USER
+        ));
+    }
+
+    @Test
+    void testSetAutoApprove_accommodationNotFound() {
+        Long accommodationId = 1L;
+        AutoApproveEvent event = new AutoApproveEvent("testUser", accommodationId, AutoApproveEvent.AutoApproveEventType.CHANGE);
+        event.setAutoapprove(true);
+
+        when(accommodationRepository.findById(accommodationId)).thenReturn(null);
+
+        assertThrows(AccommodationNotFoundException.class, () -> accommodationService.setAutoApprove(event));
+
+        verify(accommodationRepository).findById(accommodationId);
+        verify(accommodationRepository, never()).persist(any(Accommodation.class));
+    }
+
+
+    @Test
+    void testChangeAutoapproveInAccommodations() {
+        AutoApproveEvent event = new AutoApproveEvent("testUser", 1L, AutoApproveEvent.AutoApproveEventType.CHANGE);
+        event.setAutoapprove(true);
+
+        doNothing().when(accommodationRepository).changeAutoapproveInAccommodations(any(AutoApproveEvent.class));
+
+        accommodationService.changeAutoapproveInAccommodations(event);
+
+        ArgumentCaptor<AutoApproveEvent> captor = ArgumentCaptor.forClass(AutoApproveEvent.class);
+        verify(accommodationRepository).changeAutoapproveInAccommodations(captor.capture());
+
+        AutoApproveEvent capturedEvent = captor.getValue();
+        assertEquals("testUser", capturedEvent.getUsername());
+        assertEquals(1L, capturedEvent.getAccommodationId().longValue());
+        assertEquals(AutoApproveEvent.AutoApproveEventType.CHANGE, capturedEvent.getType());
+        assertTrue(capturedEvent.isAutoapprove());
+    }
+
+    @Test
+    void testChangeAutoapproveInAccommodations_doesNotApproveExistingReservations() {
+        AutoApproveEvent event = new AutoApproveEvent("testUser", 1L, AutoApproveEvent.AutoApproveEventType.CHANGE);
+        event.setAutoapprove(false);
+
+        doNothing().when(accommodationRepository).changeAutoapproveInAccommodations(any(AutoApproveEvent.class));
+
+        accommodationService.changeAutoapproveInAccommodations(event);
+
+        ArgumentCaptor<AutoApproveEvent> captor = ArgumentCaptor.forClass(AutoApproveEvent.class);
+        verify(accommodationRepository).changeAutoapproveInAccommodations(captor.capture());
+
+        AutoApproveEvent capturedEvent = captor.getValue();
+        assertEquals("testUser", capturedEvent.getUsername());
+        assertEquals(1L, capturedEvent.getAccommodationId().longValue());
+        assertEquals(AutoApproveEvent.AutoApproveEventType.CHANGE, capturedEvent.getType());
+        assertFalse(capturedEvent.isAutoapprove());
+    }
+
+
 }

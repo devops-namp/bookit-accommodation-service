@@ -21,8 +21,12 @@ public class AutoApproveEvent {
         this.accommodationId = id;
         this.type = t;
     }
+    public AutoApproveEvent(String u, AutoApproveEventType t) {
+        this.username = u;
+        this.type = t;
+    }
 
     public enum AutoApproveEventType {
-        GET_BY_USER, CHANGE
+        GET_BY_USER, CHANGE, INCREMENT
     }
 }
