@@ -165,6 +165,24 @@ class AccommodationTest {
         pad7.setReservation(reservation3);
         priceAdjustmentDateRepository.persist(pad7);
 
+        PriceAdjustmentDate pad8 = new PriceAdjustmentDate(LocalDate.of(2024, 7, 11), 150.00);
+        priceAdjustmentDateRepository.persist(pad8);
+
+        PriceAdjustmentDate pad9 = new PriceAdjustmentDate(LocalDate.of(2024, 7, 12), 150.00);
+        priceAdjustmentDateRepository.persist(pad9);
+
+        PriceAdjustmentDate pad10 = new PriceAdjustmentDate(LocalDate.of(2024, 4, 15), 150.00);
+        priceAdjustmentDateRepository.persist(pad10);
+
+        PriceAdjustmentDate pad11 = new PriceAdjustmentDate(LocalDate.of(2024, 4, 16), 150.00);
+        priceAdjustmentDateRepository.persist(pad11);
+
+        PriceAdjustmentDate pad12 = new PriceAdjustmentDate(LocalDate.of(2024, 7, 5), 150.00);
+        priceAdjustmentDateRepository.persist(pad12);
+
+        PriceAdjustmentDate pad13 = new PriceAdjustmentDate(LocalDate.of(2024, 7, 6), 150.00);
+        priceAdjustmentDateRepository.persist(pad13);
+
         // Price Adjustment Dates without Reservations
         priceAdjustmentDateRepository.persist(new PriceAdjustmentDate(LocalDate.of(2024, 7, 10), 100.00));
         priceAdjustmentDateRepository.persist(new PriceAdjustmentDate(LocalDate.of(2024, 7, 11), 100.00));
@@ -198,6 +216,12 @@ class AccommodationTest {
         priceAdjustmentRepository.persist(new PriceAdjustment(accommodation1, pad5));
         priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad6));
         priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad7));
+        priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad8));
+        priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad9));
+        priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad10));
+        priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad11));
+        priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad12));
+        priceAdjustmentRepository.persist(new PriceAdjustment(accommodation2, pad13));
     }
 
 
@@ -304,10 +328,10 @@ class AccommodationTest {
         var response = given()
             .contentType(ContentType.JSON)
             .body(request)
-            .when().put("/accommodation/price/1")
+            .when().put("/accommodation/price/" + accommo1)
             .then()
             .statusCode(200)
-            .body("id", CoreMatchers.is(1))
+            .body("id", CoreMatchers.is(accommo1.intValue()))
             .extract()
             .response();
 
@@ -367,10 +391,10 @@ class AccommodationTest {
         var response = given()
             .contentType(ContentType.JSON)
             .body(request)
-            .when().delete("/accommodation/price/2")
+            .when().delete("/accommodation/price/" + accommo2)
             .then()
             .statusCode(200)
-            .body("id", CoreMatchers.is(2))
+            .body("id", CoreMatchers.is(accommo2.intValue()))
             .extract()
             .response();
 
@@ -422,7 +446,7 @@ class AccommodationTest {
         given()
             .contentType(ContentType.JSON)
             .body(request)
-            .when().delete("/accommodation/price/2")
+            .when().delete("/accommodation/price/" + accommo2)
             .then()
             .statusCode(400)
             .body(containsString("Unable to update availability because reservation exists in chosen interval"));
