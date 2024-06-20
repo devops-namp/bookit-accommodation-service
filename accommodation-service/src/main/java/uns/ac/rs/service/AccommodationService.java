@@ -245,4 +245,15 @@ public class AccommodationService {
             r = reservationRepository.findFirstPending(username);
         }
     }
+
+    public List<AccommodationDto> getOwnersAccommodations(String ownerUsername) {
+        List<Accommodation> accommodations = accommodationRepository.findByHostUsername(ownerUsername);
+        if (accommodations == null || accommodations.isEmpty()) {
+            return List.of();
+        }
+
+        return accommodations.stream()
+                .map(AccommodationDto::new)
+                .collect(Collectors.toList());
+    }
 }
