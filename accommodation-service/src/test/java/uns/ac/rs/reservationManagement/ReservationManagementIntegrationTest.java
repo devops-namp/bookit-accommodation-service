@@ -11,6 +11,8 @@ import uns.ac.rs.controlller.dto.ReservationDto;
 import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.entity.Reservation;
 import uns.ac.rs.repository.AccommodationRepository;
+import uns.ac.rs.repository.PriceAdjustmentDateRepository;
+import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
 import uns.ac.rs.resources.PostgresResource;
 
@@ -29,12 +31,21 @@ public class ReservationManagementIntegrationTest {
     @Inject
     AccommodationRepository accommodationRepository;
 
+    @Inject
+    PriceAdjustmentRepository priceAdjustmentRepository;
+
+    @Inject
+    PriceAdjustmentDateRepository priceAdjustmentDateRepository;
+
     private Long testAccommodationId;
     private Long testReservationId;
 
     @BeforeEach
     @Transactional
     public void setup() {
+        priceAdjustmentRepository.deleteAll();
+
+        priceAdjustmentDateRepository.deleteAll();
         reservationRepository.deleteAll();
         accommodationRepository.deleteAll();
 
@@ -46,7 +57,7 @@ public class ReservationManagementIntegrationTest {
         accommodation.setMaxGuests(4);
         accommodation.setPriceType("per night");
         accommodation.setHostUsername("host");
-        accommodation.setAutoApprove(false);
+        accommodation.setAutoAcceptReservations(false);
         accommodationRepository.persist(accommodation);
         testAccommodationId = accommodation.getId();
 
