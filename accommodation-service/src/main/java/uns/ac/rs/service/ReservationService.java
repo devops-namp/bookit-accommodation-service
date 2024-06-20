@@ -11,8 +11,8 @@ import uns.ac.rs.controlller.dto.ReservationDtoToSend;
 import uns.ac.rs.entity.*;
 import uns.ac.rs.entity.events.AutoApproveEvent;
 import uns.ac.rs.entity.events.NotificationEvent;
-import uns.ac.rs.exception.ReservationCannotBeCancelledException;
-import uns.ac.rs.exception.ReservationNotFoundException;
+import uns.ac.rs.exceptions.ReservationCannotBeCancelledException;
+import uns.ac.rs.exceptions.ReservationNotFoundException;
 import uns.ac.rs.repository.PriceAdjustmentDateRepository;
 import uns.ac.rs.repository.PriceAdjustmentRepository;
 import uns.ac.rs.repository.ReservationRepository;
@@ -209,7 +209,7 @@ public class ReservationService {
     }
 
     public void hadleAutoapprove(Accommodation accommodation, Reservation created) {
-        if (accommodation.isAutoApprove()) {
+        if (accommodation.getAutoAcceptReservations()) {
             approve(created.getId());
         } else {
             eventEmitter.send(new NotificationEvent("You have new reservation request", accommodation.getHostUsername()));

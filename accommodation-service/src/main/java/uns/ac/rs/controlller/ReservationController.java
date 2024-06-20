@@ -1,8 +1,6 @@
 package uns.ac.rs.controlller;
 
-import io.vertx.core.json.JsonObject;
 import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -15,7 +13,7 @@ import uns.ac.rs.entity.Accommodation;
 import uns.ac.rs.controlller.dto.ReservationsCheckDto;
 import uns.ac.rs.controlller.request.CheckReservationsRequest;
 import uns.ac.rs.entity.Reservation;
-import uns.ac.rs.exception.ReservationCannotBeCancelledException;
+import uns.ac.rs.exceptions.ReservationCannotBeCancelledException;
 import uns.ac.rs.service.AccommodationService;
 import uns.ac.rs.service.ReservationService;
 

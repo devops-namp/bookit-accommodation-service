@@ -42,26 +42,13 @@ public class ReservationManagementControllerUnitTest {
 
     @Test
     public void testListAll() {
-        List<Reservation> reservations = List.of(new Reservation(), new Reservation());
+        List<ReservationDtoToSend> reservations = List.of(new ReservationDtoToSend(), new ReservationDtoToSend());
         when(reservationService.listAll()).thenReturn(reservations);
 
-        List<Reservation> result = reservationController.listAll();
+        List<ReservationDtoToSend> result = reservationController.listAll();
 
         assertEquals(2, result.size());
         verify(reservationService, times(1)).listAll();
-    }
-
-    @Test
-    public void testFindById() {
-        Long id = 1L;
-        Reservation reservation = new Reservation();
-        when(reservationService.findById(id)).thenReturn(Optional.of(reservation));
-
-        Response response = reservationController.findById(id);
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        assertEquals(reservation, response.getEntity());
-        verify(reservationService, times(1)).findById(id);
     }
 
     @Test

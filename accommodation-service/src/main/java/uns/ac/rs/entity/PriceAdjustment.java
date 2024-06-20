@@ -27,4 +27,9 @@ public class PriceAdjustment {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "price_adjustment_date_id", referencedColumnName = "id")
     private PriceAdjustmentDate priceAdjustmentDate;
+
+    public PriceAdjustment(Accommodation accommodation,PriceAdjustmentDate priceAdjustmentDate){
+        this.accommodation = accommodation;
+        this.priceAdjustmentDate = priceAdjustmentDate;
+    }
 }
