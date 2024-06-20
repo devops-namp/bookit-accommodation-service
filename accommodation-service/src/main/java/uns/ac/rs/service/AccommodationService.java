@@ -235,7 +235,7 @@ public class AccommodationService {
         }
     }
 
-    private void approveExistingReservations(String username) {
+    public void approveExistingReservations(String username) {
         Reservation r = reservationRepository.findFirstPending(username);
         while (r != null) {
             reservationService.approve(r.getId());

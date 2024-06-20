@@ -2,12 +2,14 @@ package uns.ac.rs.controlller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uns.ac.rs.entity.Reservation;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class ReservationDtoToSend {
     private Long id;
     private AccommodationDto accommodationDto;
