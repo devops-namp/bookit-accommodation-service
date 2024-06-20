@@ -1,6 +1,6 @@
-package uns.ac.rs.exception;
+package uns.ac.rs.exceptions;
 
-public class ReservationCannotBeCancelledException extends GenericException{
+public class ReservationCannotBeCancelledException extends GenericException {
 
 
     public ReservationCannotBeCancelledException(String s) {

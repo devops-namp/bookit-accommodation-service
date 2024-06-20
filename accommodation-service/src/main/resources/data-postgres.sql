@@ -1,9 +1,9 @@
-INSERT INTO public."bookit-accommodation" (name, hostusername, location, filters, minguests, maxguests, pricetype, deleted)
+INSERT INTO public."bookit-accommodation" (autoAcceptReservations, name, hostusername, location, filters, minguests, maxguests, pricetype, deleted)
 VALUES
-('Mountain Cabin Retreat', 'username2', 'Aspen', 'wifi,parking,fireplace,bath', 2, 6, 'price_per_person', false),
-('City Center Studio',  'host2', 'New York', 'wifi,parking,tv', 1, 2, 'price_per_person', false),
-('Beachfront Condo', 'host2', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_unit', false),
-('Beachfront Condo123', 'username3', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_person', false);
+(false, 'Mountain Cabin Retreat', 'username2', 'Aspen', 'wifi,parking,fireplace,bath', 2, 6, 'price_per_person', false),
+(false, 'City Center Studio',  'host2', 'New York', 'wifi,parking,tv', 1, 2, 'price_per_person', false),
+(false, 'Beachfront Condo', 'host2', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_unit', false),
+(false, 'Beachfront Condo123', 'username3', 'Malibu', 'wifi,parking,pool', 1, 4, 'price_per_person', false);
 
 
 INSERT INTO reservation (accommodation_id, guestusername, state, numofguests, fromdate, todate, totalprice, deleted)

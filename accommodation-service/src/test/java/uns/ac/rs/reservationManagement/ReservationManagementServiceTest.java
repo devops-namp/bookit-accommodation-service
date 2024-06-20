@@ -110,7 +110,7 @@ class ReservationManagementServiceTest {
     @Test
     void testHandleAutoapprove_AutoApproveFalse() {
         Accommodation accommodation = new Accommodation();
-        accommodation.setAutoApprove(false);
+        accommodation.setAutoAcceptReservations(false);
         accommodation.setHostUsername("hostUsername");
 
         Reservation created = new Reservation();
@@ -158,34 +158,11 @@ class ReservationManagementServiceTest {
         verify(eventEmitter).send(any(NotificationEvent.class));
     }
 
-//    @Test
-//    void testHandleAutoapprove_AutoApproveTrue() {
-//        Accommodation accommodation = new Accommodation();
-//        accommodation.setId(1L);  // Dodavanje ID-a smeštaja
-//        accommodation.setAutoApprove(true);
-//        accommodation.setHostUsername("hostUsername");
-//
-//        Reservation created = new Reservation();
-//        created.setId(1L);
-//        created.setState(Reservation.ReservationState.PENDING);
-//        created.setAccommodation(accommodation);  // Povezivanje smeštaja sa rezervacijom
-//        created.setFromDate(LocalDate.now().plusDays(1));  // Postavljanje datuma početka rezervacije
-//        created.setToDate(LocalDate.now().plusDays(5));  // Postavljanje datuma završetka rezervacije
-//
-//        when(reservationRepository.findByIdOptional(created.getId())).thenReturn(Optional.of(created));
-//
-//        reservationService.hadleAutoapprove(accommodation, created);
-//
-//        assertEquals(Reservation.ReservationState.APPROVED, created.getState());
-//        verify(reservationRepository, times(2)).persist(any(Reservation.class));
-//        verify(eventEmitter, times(2)).send(any(NotificationEvent.class));
-//    }
-
     @Test
     void testHandleAutoapprove_AutoApproveTrue() {
         Accommodation accommodation = new Accommodation();
         accommodation.setId(1L);  // Dodavanje ID-a smeštaja
-        accommodation.setAutoApprove(true);
+        accommodation.setAutoAcceptReservations(true);
         accommodation.setHostUsername("hostUsername");
 
         Reservation created = new Reservation();

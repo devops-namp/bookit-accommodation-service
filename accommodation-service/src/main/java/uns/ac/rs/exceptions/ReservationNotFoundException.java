@@ -1,6 +1,6 @@
-package uns.ac.rs.exception;
+package uns.ac.rs.exceptions;
 
-public class ReservationNotFoundException extends GenericException{
+public class ReservationNotFoundException extends GenericException {
 
     public ReservationNotFoundException(String s) {
         super(s);

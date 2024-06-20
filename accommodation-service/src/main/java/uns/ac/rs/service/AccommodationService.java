@@ -5,13 +5,15 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import uns.ac.rs.controlller.dto.AccommodationDto;
 import uns.ac.rs.controlller.dto.AccommodationWithPrice;
 import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.entity.*;
+import uns.ac.rs.entity.events.AutoApproveEvent;
+import uns.ac.rs.entity.events.NotificationEvent;
 import uns.ac.rs.exceptions.AccommodationNotFoundException;
 import uns.ac.rs.exceptions.ReservationExistsOnDateException;
 import uns.ac.rs.repository.*;
-import uns.ac.rs.exception.AccommodationNotFoundException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -219,10 +221,10 @@ public class AccommodationService {
     public void setAutoApprove(AutoApproveEvent event) {
         Accommodation accommodation = accommodationRepository.findById(event.getAccommodationId());
         if (accommodation != null) {
-            accommodation.setAutoApprove(event.isAutoapprove());
+            accommodation.setAutoAcceptReservations(event.isAutoapprove());
             persist(accommodation);
         } else {
-            throw new AccommodationNotFoundException("Accommodation with id " + event.getAccommodationId() + " not found");
+            throw new AccommodationNotFoundException();
         }
     }
 
