@@ -191,14 +191,14 @@ public class ReservationService {
         } else {
             text = "Your reservation has been rejected";
         }
-        NotificationEvent e = new NotificationEvent(r.getGuestUsername(), text);
+        NotificationEvent e = new NotificationEvent(text, r.getGuestUsername(), NotificationType.RESERVATION_REQUEST_RESOLVED);
         eventEmitter.send(e);
     }
 
     public void rejectByGuest(Long reservationId) {
         Reservation r = changeStatus(reservationId, Reservation.ReservationState.DECLINED);
         if (!r.getFromDate().isAfter(LocalDate.now().plusDays(1))) throw new ReservationCannotBeCancelledException("Reservation cannot be cancelled as it starts tomorrow or has already started");
-        NotificationEvent e = new NotificationEvent(r.getGuestUsername(), r.getGuestUsername() + " canceled the reservation.");
+        NotificationEvent e = new NotificationEvent(r.getGuestUsername() + " canceled the reservation.", r.getGuestUsername(), NotificationType.RESERVATION_DECLINED);
         eventEmitter.send(e);
         autoApproveEmmiter.send(new AutoApproveEvent(r.getGuestUsername(), AutoApproveEvent.AutoApproveEventType.INCREMENT));
         deletePriceAdjustments(r);
@@ -212,7 +212,7 @@ public class ReservationService {
         if (accommodation.getAutoAcceptReservations()) {
             approve(created.getId());
         } else {
-            eventEmitter.send(new NotificationEvent("You have new reservation request", accommodation.getHostUsername()));
+            eventEmitter.send(new NotificationEvent("You have new reservation request", accommodation.getHostUsername(), NotificationType.RESERVATION_REQUEST_CREATED));
         }
 
     }

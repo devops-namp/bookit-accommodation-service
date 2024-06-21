@@ -51,13 +51,6 @@ public class AccommodationController {
         return accommodationService.getAll().stream().map(AccommodationDto::new).toList();
     }
 
-    @Incoming("filter-response-queue")
-    public void consume(JsonObject json) {
-        Book book = json.mapTo(Book.class);
-        System.out.println("Primljena knjiga " + book.title + " by " + book.author);
-    }
-
-
     @Incoming("autoapprove-user-to-acc-queue")
     public void setAutoapprove(JsonObject json) {
         AutoApproveEvent event = json.mapTo(AutoApproveEvent.class);

@@ -241,7 +241,7 @@ public class AccommodationService {
         Reservation r = reservationRepository.findFirstPending(username);
         while (r != null) {
             reservationService.approve(r.getId());
-            reservationService.eventEmitter.send(new NotificationEvent("Your reservation has been approved", r.getGuestUsername()));
+            reservationService.eventEmitter.send(new NotificationEvent("Your reservation has been approved", r.getGuestUsername(), NotificationType.RESERVATION_REQUEST_RESOLVED));
             r = reservationRepository.findFirstPending(username);
         }
     }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uns.ac.rs.entity.NotificationType;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ public class NotificationEvent {
 
     private String text;
     private String recipientId;
+    private NotificationType notificationType;
     //private LocalDateTime time;
 
 
