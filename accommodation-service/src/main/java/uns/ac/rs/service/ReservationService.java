@@ -156,6 +156,13 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public List<ReservationDtoToSend> getByGuestHistory(String username) {
+        return reservationRepository.getByGuestHistory(username).stream()
+                .map(ReservationDtoToSend::new)
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public Reservation changeStatus(Long reservationId, Reservation.ReservationState newState) {

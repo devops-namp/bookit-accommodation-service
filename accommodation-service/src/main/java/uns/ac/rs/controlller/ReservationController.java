@@ -88,6 +88,16 @@ public class ReservationController {
         return Response.ok(retVal).build();
     }
 
+    @GET
+    @Path("/getByGuestHistory/{username}")
+//    @RolesAllowed({ "GUEST" })
+    @PermitAll
+    public Response getByGuestHistory(@PathParam("username") String username) {
+        System.out.println("HELOOOO");
+        List<ReservationDtoToSend> retVal = reservationService.getByGuestHistory(username);
+        return Response.ok(retVal).build();
+    }
+
     @POST
     @Path("/approve/{reservationId}")
 //    @RolesAllowed({ "HOST" })
