@@ -19,6 +19,7 @@ import uns.ac.rs.service.ReservationService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Path("/reservations")
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,6 +30,8 @@ public class ReservationController {
     ReservationService reservationService;
     @Inject
     AccommodationService accommodationService;
+
+    private final Logger LOG = Logger.getLogger(String.valueOf(ReservationController.class));
 
     @GET
     public List<ReservationDtoToSend> listAll() {
@@ -133,7 +136,9 @@ public class ReservationController {
     @Path("/check")
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkFutureReservations(CheckReservationsRequest request) {
+        LOG.info("Checking future reservations for user: " + request.getUsername() + " with role: " + request.getRole());
         var result = reservationService.hasFutureReservations(request.getUsername(), request.getRole());
+        LOG.info("User has future reservations: " + result);
         return Response.ok(new ReservationsCheckDto(result)).build();
     }
 

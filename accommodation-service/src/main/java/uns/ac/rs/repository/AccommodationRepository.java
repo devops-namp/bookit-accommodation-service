@@ -14,6 +14,7 @@ import uns.ac.rs.entity.events.AutoApproveEvent;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -123,20 +124,16 @@ public class AccommodationRepository implements PanacheRepository<Accommodation>
         LocalDate startOfMonth = LocalDate.of(year, month, 1);
         LocalDate endOfMonth = startOfMonth.plusMonths(1).minusDays(1);
 
-        String queryStr = "SELECT pad " +
-                "FROM PriceAdjustmentDate pad " +
-                "LEFT JOIN pad.reservation res " +
-                "WHERE pad.date BETWEEN :startOfMonth AND :endOfMonth " +
-                "AND (pad.reservation IS NULL OR res.accommodation.id = :accommodationId)";
+        List<PriceAdjustmentDate> result = getEntityManager().createQuery(
+                "SELECT pad FROM PriceAdjustmentDate pad WHERE pad.date BETWEEN :startOfMonth AND :endOfMonth AND pad.priceAdjustment.accommodation.id = :accommodationId",
+                PriceAdjustmentDate.class)
+                .setParameter("startOfMonth", startOfMonth)
+                .setParameter("endOfMonth", endOfMonth)
+                .setParameter("accommodationId", accommodation.getId())
+                .getResultList();
 
-        TypedQuery<PriceAdjustmentDate> query = getEntityManager().createQuery(queryStr, PriceAdjustmentDate.class);
-        query.setParameter("accommodationId", accommodation.getId());
-        query.setParameter("startOfMonth", startOfMonth);
-        query.setParameter("endOfMonth", endOfMonth);
 
-        List<PriceAdjustmentDate> pads = query.getResultList();
-
-        return pads.stream()
+        return result.stream()
                 .map(pad -> new DateInfoDto(
                         pad.getDate().toString(),
                         pad.getPrice(),
