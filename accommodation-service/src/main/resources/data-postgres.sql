@@ -9,6 +9,7 @@ VALUES
 INSERT INTO reservation (accommodation_id, guestusername, state, numofguests, fromdate, todate, totalprice, deleted)
 VALUES
 (1, 'guestUser1', 'APPROVED', 2, '2024-07-10', '2024-07-14', 600.00, false),
+(1, 'guestUser1', 'APPROVED', 2, '2024-03-10', '2024-03-14', 600.00, false),
 (2, 'guestUser2', 'PENDING', 1, '2024-07-12', '2024-07-16', 400.00, false),
 (4, 'guestUser2', 'APPROVED', 1, '2024-01-12', '2024-01-16', 500.00, false);
 

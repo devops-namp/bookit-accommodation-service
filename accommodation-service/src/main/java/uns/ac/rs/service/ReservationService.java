@@ -178,16 +178,16 @@ public class ReservationService {
 
     public boolean hasFutureReservations(String username, String role) {
         if (role.equals("GUEST")) {
-            return reservationRepository.getByGuest(username)
-                .stream()
-                .filter(reservation -> reservation.getState().equals("APPROVED") && reservation.getToDate().isAfter(LocalDate.now()))
-                .toList().size() > 0;
+            return !reservationRepository.getByGuest(username)
+                    .stream()
+                    .filter(reservation -> reservation.getState().equals(Reservation.ReservationState.APPROVED) && reservation.getToDate().isAfter(LocalDate.now()))
+                    .toList().isEmpty();
         }
         if (role.equals("HOST")) {
-            return reservationRepository.getByHost(username)
-                .stream()
-                .filter(reservation -> reservation.getState().equals("APPROVED") && reservation.getToDate().isAfter(LocalDate.now()))
-                .toList().size() > 0;
+            return !reservationRepository.getByHost(username)
+                    .stream()
+                    .filter(reservation -> reservation.getState().equals(Reservation.ReservationState.APPROVED) && reservation.getToDate().isAfter(LocalDate.now()))
+                    .toList().isEmpty();
         }
         return false;
     }
