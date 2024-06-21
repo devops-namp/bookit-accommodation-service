@@ -32,6 +32,10 @@ public class ReservationRepository implements PanacheRepository<Reservation> {
         return list("SELECT r FROM Reservation r WHERE NOT r.deleted AND r.guestUsername = ?1", username);
     }
 
+    public List<Reservation> getByGuestHistory(String username) {
+        return list("SELECT r FROM Reservation r WHERE NOT r.deleted AND r.guestUsername = ?1 AND r.state = 'APPROVED' AND r.toDate < CURRENT_DATE", username);
+    }
+
     public boolean exists(Long accommodationId, LocalDate date) {
         return list("SELECT r FROM Reservation r WHERE NOT r.deleted AND r.accommodation.id = ?1 AND " +
             "r.fromDate <= ?2 AND r.toDate >= ?2 AND (r.state = 'PENDING' OR r.state = 'APPROVED')", accommodationId, date).size() > 0;
