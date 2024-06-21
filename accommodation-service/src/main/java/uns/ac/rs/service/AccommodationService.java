@@ -11,6 +11,7 @@ import uns.ac.rs.controlller.dto.DateInfoDto;
 import uns.ac.rs.entity.*;
 import uns.ac.rs.entity.events.AutoApproveEvent;
 import uns.ac.rs.entity.events.NotificationEvent;
+import uns.ac.rs.entity.events.NotificationType;
 import uns.ac.rs.exceptions.AccommodationNotFoundException;
 import uns.ac.rs.exceptions.ReservationExistsOnDateException;
 import uns.ac.rs.repository.*;
@@ -241,7 +242,7 @@ public class AccommodationService {
         Reservation r = reservationRepository.findFirstPending(username);
         while (r != null) {
             reservationService.approve(r.getId());
-            reservationService.eventEmitter.send(new NotificationEvent("Your reservation has been approved", r.getGuestUsername()));
+            reservationService.eventEmitter.send(new NotificationEvent("Your reservation has been approved", r.getGuestUsername(), NotificationType.RESERVATION_REQUEST_RESOLVED));
             r = reservationRepository.findFirstPending(username);
         }
     }

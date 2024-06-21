@@ -15,8 +15,8 @@ public class NotificationEvent {
 
     private String text;
     private String recipientId;
+    private NotificationType notificationType;
     //private LocalDateTime time;
-
 
 
 
